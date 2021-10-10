@@ -62,7 +62,6 @@ body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
   font: 14px/20px 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  background-color: #373737;
 }
 .footer {
   position: absolute;
@@ -70,4 +69,16 @@ body {
   width: 100%;
   white-space: nowrap;
   line-height: 60px; /* Vertically center the text there */
+}
+
+/* ------------------- */
+
+.col-sm {
+  border: #0366d6;
+  border-width: 3px;
+}
+
+.row {
+  border: crimson;
+  border-width: 3px;
 }

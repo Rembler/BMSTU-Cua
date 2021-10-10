@@ -176,7 +176,6 @@ namespace Cua.Controllers
                 ModelState.AddModelError("", "Пользователь с такой почтой уже зарегистрирован");
                 return View(model);
             }
-            ModelState.AddModelError("", "Некорректная почта и/или пароль");
             return View(model);
         }
 

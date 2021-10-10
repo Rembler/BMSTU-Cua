@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Cua.Models
 {
     public class User
@@ -10,5 +12,10 @@ namespace Cua.Models
         public byte[] StoredSalt { get; set; }
         public string ConfirmationToken { get; set; }
         public bool IsConfirmed { get; set; }
+        public ICollection<Room> Rooms { get; set; }
+        public User()
+        {
+            Rooms = new List<Room>();
+        }
     }
 }

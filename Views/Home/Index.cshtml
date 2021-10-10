@@ -2,7 +2,45 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@model IEnumerable<Cua.Models.Room>
+
+<div class="container">
+@{int index = 0;}
+@foreach (var item in Model)
+{
+    @if (index % 2 == 0)
+    {
+        @Html.Raw("<div class=\"row\">");
+    }
+    <div class="col-sm">
+        @* <p hidden="true">@item.Id</p> *@
+        <p>@item.Name</p>
+        @foreach (var user in @item.Users)
+        {
+            if (user.Id == @item.AdminId)
+            {
+                <p>Owner: @user.Name @user.Surname</p>
+            }
+        }
+        <a class="btn btn-info btn-sm" onclick="addUser(@item.Id);">Join</a>
+        <div id="users-list-@item.Id">
+            <p>Participants:</p>
+            @foreach (var user in @item.Users)
+            {
+                if (user.Id != @item.AdminId)
+                {
+                    <p>@user.Name @user.Surname</p>
+                }
+            }
+        </div>
+    </div>
+    @if (index % 2 == 1)
+    {
+        @Html.Raw("</div>");
+    }
+    {index++;}
+}
+@if (index % 2 != 1)
+{
+    @Html.Raw("</div>");
+}

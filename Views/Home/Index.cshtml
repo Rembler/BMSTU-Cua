@@ -2,45 +2,120 @@
     ViewData["Title"] = "Home Page";
 }
 
-@model IEnumerable<Cua.Models.Room>
+@model Cua.ViewModels.MyRoomsModel
 
-<div class="container">
-@{int index = 0;}
-@foreach (var item in Model)
-{
-    @if (index % 2 == 0)
-    {
-        @Html.Raw("<div class=\"row\">");
-    }
-    <div class="col-sm">
-        @* <p hidden="true">@item.Id</p> *@
-        <p>@item.Name</p>
-        @foreach (var user in @item.Users)
-        {
-            if (user.Id == @item.AdminId)
-            {
-                <p>Owner: @user.Name @user.Surname</p>
-            }
-        }
-        <a class="btn btn-info btn-sm" onclick="addUser(@item.Id);">Join</a>
-        <div id="users-list-@item.Id">
-            <p>Participants:</p>
-            @foreach (var user in @item.Users)
-            {
-                if (user.Id != @item.AdminId)
-                {
-                    <p>@user.Name @user.Surname</p>
-                }
-            }
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content separate-div modal-div">
+            <div class="modal-header">
+                <div class="room-content content-modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Want to create or join a room?</h5>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a asp-controller="Room" asp-action="Create"><button type="button" class="btn btn-primary create-btn">Create</button></a>
+                <button type="button" class="btn btn-primary join-btn">Join</button>
+            </div>
         </div>
     </div>
-    @if (index % 2 == 1)
-    {
-        @Html.Raw("</div>");
-    }
-    {index++;}
-}
-@if (index % 2 != 1)
+</div>
+
+<div class="container separate-div menu-div">
+    <div class="row">
+        <div class="col">
+            <input class="find-room-input" type="text" placeholder="Find a room..."/>
+        </div>
+        <div class="col-2">
+            <div class="dropdown">
+                <p hidden id="direction">1</p>
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Sort
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a id="created-joined" class="dropdown-item" href="#" onclick="return false;">Created / Joined</a>
+                    @* <a id="last-updated" class="dropdown-item" href="#" onclick="return false;">Last updated</a>   *@
+                    <a id="name" class="dropdown-item" href="#" onclick="return false;">Name</a>                                      
+                </div>
+            </div>
+        </div>
+        <div class="col-2">
+            <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#exampleModalCenter">Add</button>
+        </div>
+    </div>
+</div>
+
+<div class="container room-holder">
+
+@foreach (var item in Model.myRooms)
 {
-    @Html.Raw("</div>");
+    <div class="container separate-div">
+        <div class="row">
+            <div class="col">
+                <div class="row">
+                    <div class="col-8 room-content"><p class="room-name">@item.Name</p></div>
+                    <div class="col room-content"><p class="admin-name">Admin: me</p></div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col room-content room-activity"><p>Что-то</p></div>
+                            <div class="col room-content room-activity"><p>Кто-то</p></div>
+                            <div class="col room-content room-activity"><p>Где-то</p></div>
+                        </div>
+                    </div>
+                    <div class="col-1 room-content room-participants">
+                        @foreach (var user in @item.Users)
+                        {   
+                            if (user.Id != @item.AdminId)
+                            {
+                                <p>@user.Name</p><br/>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 }
+
+@foreach (var item in Model.notMyRooms)
+{
+    <div class="container separate-div">
+        <div class="row">
+            <div class="col">
+                <div class="row">
+                    <div class="col-8 room-content"><p class="room-name">@item.Name</p></div>
+                    <div class="col room-content">
+                        @foreach (var user in item.Users)
+                        {   
+                            if (user.Id == item.AdminId)
+                            {
+                                <p class="admin-name">Admin: @user.Name @user.Surname</p><br/>
+                                break;
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col room-content room-activity"><p>Что-то</p></div>
+                            <div class="col room-content room-activity"><p>Кто-то</p></div>
+                            <div class="col room-content room-activity"><p>Где-то</p></div>
+                        </div>
+                    </div>
+                    <div class="col-1 room-content room-participants">
+                        @foreach (var user in item.Users)
+                        {   
+                            if (user.Id != item.AdminId)
+                            {
+                                <p>@user.Name</p><br/>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+</div>

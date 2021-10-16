@@ -19,9 +19,11 @@ namespace Cua.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            CreateRoomModel model = new CreateRoomModel() { Company = user.Company, About = "Generic room description" };
+            return View(model);
         }
         
         [HttpPost]
@@ -31,8 +33,10 @@ namespace Cua.Controllers
             if (ModelState.IsValid)
             {
                 User admin = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
-                Room newRoom = new Room { Name = model.Name, AdminId = admin.Id };
-                newRoom.Users.Add(admin);
+                Room newRoom = new Room {
+                    Name = model.Name, Company = model.Company,
+                    About = model.About, Private = model.Private,
+                    Hidden = model.Hidden, Admin = admin };
                 db.Rooms.Add(newRoom);
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index", "Home");
@@ -43,9 +47,8 @@ namespace Cua.Controllers
         public async Task<IActionResult> Join()
         {
             User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
-            List<Room> rooms = db.Rooms.Include(r => r.Users).Where(r => !r.Users.Contains(user)).ToList();
-            // Console.WriteLine(user.Email);
-            // Console.Write(rooms.Count());
+            List<Room> rooms = db.Rooms.Include(r => r.Admin).Include(r => r.Users).Where(r => r.Admin != user && !r.Users.Contains(user)).ToList();
+            ViewBag.CurrentUser = user.Email;
             return View(rooms);
         }
 

@@ -21,34 +21,36 @@
 <div class="row">
     <div class="aling-self-start col-3 separate-div criteria-div">
         <div class="room-content criteria-header"><p>Search criteria</p></div>
-        <input id="room-cri" class="find-room-input criteria-input" type="text" placeholder="Room name"/>
-        <input id="admin-cri" class="find-room-input criteria-input" type="text" placeholder="Admin name"/>
-        <input id="company-cri" class="find-room-input criteria-input" type="text" placeholder="Company name"/>
+        <input id="room-cri" class="my-input criteria-input" type="text" placeholder="Room name"/>
+        <input id="admin-cri" class="my-input criteria-input" type="text" placeholder="Admin name"/>
+        <input id="company-cri" class="my-input criteria-input" type="text" placeholder="Company name"/>
         <div class="checkbox-holder">
-            <input type="checkbox"/><label>Private room?</label>
+            <input id="private-checkbox" type="checkbox"/><label>Only private rooms</label>
         </div>
     </div>
     <div id="room-for-join-holder" class="flex-fill ml-5">
-    @{var index = 0;}
     @foreach (var item in Model)
     {
-        {index++;}
+        @if (!item.Hidden)
+        {
         <div class="separate-div room-for-join-div">
             <p id="roomId-@item.Id" class="hidden-p" hidden>@item.Id</p>
             <div class="row">
                 <div class="col">
                     <div class="row">
-                        <div class="col-1 illustration"><i class="icon ion-ios-locked-outline"></i></div>
+                        <div class="col-1 illustration">
+                        @if (item.Private)
+                        {
+                            <ion-icon name="lock-closed-outline"></ion-icon>
+                        }
+                        else
+                        {
+                            <ion-icon name="lock-open-outline"></ion-icon>
+                        }
+                        </div>
                         <div class="col room-content"><p class="room-name">@item.Name</p></div>
                         <div class="col-4 room-content">
-                            @foreach (var user in item.Users)
-                            {   
-                                if (user.Id == item.AdminId)
-                                {
-                                    <p class="admin-name">Admin: @user.Name @user.Surname @index</p><br/>
-                                    break;
-                                }
-                            }
+                            <p class="admin-name">Admin: @item.Admin.Name @item.Admin.Surname</p><br/>
                         </div>
                     </div>
                     <div class="row">
@@ -60,13 +62,14 @@
                         <div class="col room-content"><p>Кто-то</p></div>
                     </div>
                     <div class="row">
-                        <div class="col room-content company-name"><p>Company: @index</p></div>
-                        <div class="col room-content"><p>Participants: 10:</p></div>
+                        <div class="col room-content company-name"><p>Organization: @item.Company</p></div>
+                        <div class="col room-content"><p>Number of participants: @item.Users.Count()</p></div>
                         <div class="col join-btn-holder"><button class="btn btn-primary join-room-btn" data-toggle="modal" data-target="#exampleModalCenter">Join</button></div>
                     </div>
                 </div>
             </div>
         </div>
+        }
     }
     </div>
 </div>

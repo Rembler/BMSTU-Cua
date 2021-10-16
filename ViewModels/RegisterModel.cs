@@ -13,6 +13,8 @@ namespace Cua.ViewModels
 
         [Required(ErrorMessage = "Не указана фамилия")]
         public string Surname { get; set; }
+        
+        public string Company { get; set; }
          
         [Required(ErrorMessage = "Не указан пароль")]
         [StringLength(20, ErrorMessage = "Пароль должен содержать как минимум {2} символов", MinimumLength = 6)]

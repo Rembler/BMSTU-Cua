@@ -27,14 +27,18 @@ namespace Cua.Controllers
         public async Task<IActionResult> Index()
         {
             User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
-            List<Room> myRoomsList = db.Rooms.Include(r => r.Users).Where(r => r.AdminId == user.Id).ToList();
-            List<Room> notMyRoomsList = db.Rooms.Include(r => r.Users).Where(r => r.AdminId != user.Id && r.Users.Contains(user)).ToList();
-            MyRoomsModel allRooms = new MyRoomsModel() { 
-                myRooms = myRoomsList, 
-                notMyRooms = notMyRoomsList, 
-                currentUser = user
-            };
-            return View(allRooms);
+            List<Room> roomsList = db.Rooms
+                .Include(r => r.Admin)
+                .Include(r => r.Users)
+                .Where(r => r.Admin == user)
+                .ToList();
+            roomsList = roomsList.Concat(db.Rooms
+                .Include(r => r.Admin)
+                .Include(r => r.Users)
+                .Where(r => r.Users.Contains(user))
+                .ToList()).ToList();
+            ViewBag.CurrentUser = user.Email;
+            return View(roomsList);
         }
 
         public IActionResult Privacy()

@@ -155,8 +155,8 @@ namespace Cua.Controllers
                     db.Users.Add(new User {
                         Name = model.Name, Surname = model.Surname,
                         Email = model.Email, Password = hashsalt.Hash,
-                        StoredSalt = hashsalt.Salt, IsConfirmed = false,
-                        ConfirmationToken = generatedToken });
+                        Company = model.Company, StoredSalt = hashsalt.Salt, 
+                        IsConfirmed = false, ConfirmationToken = generatedToken });
                     await db.SaveChangesAsync();
 
                     var addedUser = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);

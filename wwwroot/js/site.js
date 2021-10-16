@@ -173,3 +173,19 @@ $("#company-cri").keyup(function() {
         }
     });
 });
+
+$("#private-checkbox").click(function() {
+
+    var status = $(this).is(":checked");
+    var $rooms = $("#room-for-join-holder"),
+        $roomsList = $rooms.children();
+
+    $roomsList.each(function() {
+        var picName = $(this).find("ion-icon").attr("name");
+        if (picName == "lock-open-outline" && status) {
+            $(this).hide();
+        } else {
+            $(this).show();
+        }
+    });
+});

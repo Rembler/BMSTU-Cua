@@ -1,13 +1,42 @@
 @model Cua.ViewModels.CreateRoomModel
 
+<div class="container my-create-room-container separate-div">
 <form class="login" asp-action="Create" asp-controller="Room" asp-anti-forgery="true">
     <h2 class="sr-only">Create room form</h2>
     <div class="validation" asp-validation-summary="ModelOnly"></div>
-    <div class="form-group">
-        <input class="form-control" type="text" asp-for="Name" placeholder="Name" />
+    <div class="form-group my-create-input-div">
+        <input class="my-input" type="text" asp-for="Name" placeholder="Name" />
         <span asp-validation-for="Name"></span>
     </div>
-    <div class="form-group">
-        <input class="btn btn-primary btn-block" type="submit" value="Create" />
+    <div class="form-group my-create-input-div">
+        <input class="my-input" type="text" asp-for="Company" placeholder="Organization" value=@Model.Company />
+        <span asp-validation-for="Company"></span>
+    </div>
+    <div class="form-group my-create-input-div">
+        <input class="my-input" type="text" asp-for="About" placeholder="Short description" value=@Model.About />
+        <span asp-validation-for="About"></span>
+    </div>
+    <div class="row form-group my-checkbox-div">
+        <div class="my-checkbox-holder">
+            <input class="my-create-room-checkbox" type="checkbox" asp-for="Hidden"/>
+        </div>
+        <div id="my-hidden-label-holder" class="room-content">
+            <p class="my-checkbox-label">Hide room?</p>
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="my-checkbox-holder">
+            <input class="my-create-room-checkbox" type="checkbox" asp-for="Private"/>
+        </div>
+        <div id="my-private-label-holder" class="room-content">
+            <p class="my-checkbox-label">Make room private?</p>
+        </div>
+    </div>
+    <div class="form-group row">
+        <a class="my-create-room-back-link" asp-controller="Home" asp-action="Index">
+            <button type="button" class="btn btn-secondary my-create-room-back-btn">Back</button>
+        </a>
+        <input class="btn btn-primary my-create-room-btn" type="submit" value="Create" />
     </div>
 </form>
+</div>

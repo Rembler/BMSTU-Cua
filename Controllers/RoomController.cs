@@ -40,20 +40,28 @@ namespace Cua.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> Join()
+        {
+            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            List<Room> rooms = db.Rooms.Include(r => r.Users).Where(r => !r.Users.Contains(user)).ToList();
+            // Console.WriteLine(user.Email);
+            // Console.Write(rooms.Count());
+            return View(rooms);
+        }
+
         public async Task<JsonResult> AddUser(int id)
         {
-            var value = new List<string>();
             User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
             var room = await db.Rooms.FindAsync(id);
-            var roomUsers = db.Users.Where(u => u.Rooms.Any(r => r.Id == id)).ToList();
             if (user != null && room != null)
             {
-                if (!roomUsers.Contains(user))
+                // var roomUsers = db.Users.Where(u => u.Rooms.Any(r => r.Id == id)).ToList();
+                if (!room.Users.Contains(user))
                 {
                     room.Users.Add(user);
                     db.Rooms.Update(room);
                     await db.SaveChangesAsync();
-                    return Json($"{user.Name} {user.Surname}");
+                    return Json("OK");
                 }
                 Console.Write("User already in the room");
                 return Json(null);

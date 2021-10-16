@@ -19,6 +19,31 @@ function addUser(id) {
         });
 }
 
+$(".join-room-btn").click(function() {
+
+    var room = $(this).closest(".room-for-join-div");
+    var roomId = room.find(".hidden-p").text();
+    $("#got-id").text(roomId);
+});
+
+$("#addRoom").click(function() {
+
+    var roomId = $("#got-id").text();
+    $.post("/Room/AddUser", { id: roomId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+                $("#exampleModalCenter").modal("toggle");
+                var toDel = $(`#roomId-${roomId}`).closest(".room-for-join-div");
+                toDel.remove();
+            }
+        })
+});
+
+
 $("#name").click(function() {
 
     var direction = parseInt($("#direction").text());
@@ -88,21 +113,63 @@ $("#created-joined").click(function() {
 $(".find-room-input").keyup(function() {
 
     var searchFor = $(this).val();
-    console.log("search for " + searchFor);
     var $rooms = $(".room-holder"),
         $roomsList = $rooms.children();
     
     $roomsList.each(function() {
         var name = $(this).find(".room-name").text();
-        console.log("found " + name);
         if (name.includes(searchFor)) {
             $(this).show();
-            console.log("show it");
         } else {
             $(this).hide();
-            console.log("hide it");
         }
     });
+});
 
-    $roomsList.detach().appendTo($rooms);
+$("#room-cri").keyup(function() {
+
+    var searchFor = $(this).val();
+    var $rooms = $("#room-for-join-holder"),
+        $roomsList = $rooms.children();
+    
+    $roomsList.each(function() {
+        var name = $(this).find(".room-name").text();
+        if (name.includes(searchFor)) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
+});
+
+$("#admin-cri").keyup(function() {
+
+    var searchFor = $(this).val();
+    var $rooms = $("#room-for-join-holder"),
+        $roomsList = $rooms.children();
+    
+    $roomsList.each(function() {
+        var name = $(this).find(".admin-name").text();
+        if (name.includes(searchFor)) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
+});
+
+$("#company-cri").keyup(function() {
+
+    var searchFor = $(this).val();
+    var $rooms = $("#room-for-join-holder"),
+        $roomsList = $rooms.children();
+    
+    $roomsList.each(function() {
+        var name = $(this).find(".company-name").text();
+        if (name.includes(searchFor)) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
 });

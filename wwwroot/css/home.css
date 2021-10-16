@@ -31,10 +31,6 @@
     max-width: 33.33%;
 }
 
-.room-container {
-    max-width: 1250px;
-}
-
 div.room-content p {
     vertical-align: middle;
     display: table-cell;
@@ -43,13 +39,6 @@ div.room-content p {
 .separator-container {
     width: 1140px;
     margin: 0px 40px;
-}
-
-.illustration {
-    text-align: center;
-    padding: 15px 0;
-    font-size: 100px;
-    color: #2980ef;
 }
 
 .btn-primary {
@@ -141,15 +130,11 @@ div.dropdown {
     border-top: none;
 }
 
-.join-btn {
-    width: 30%;
-}
-
 .modal-footer a {
     width: 30%;
 }
 
-.create-btn {
+.cj-btn {
     width: 100%;
 }
 

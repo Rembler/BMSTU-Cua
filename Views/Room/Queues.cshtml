@@ -1,0 +1,80 @@
+@model IEnumerable<Queue>
+
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <p id="got-id" hidden></p>
+        <div class="modal-content separate-div modal-div">
+            <div class="modal-header">
+                <div class="content-div content-modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Want to join a queue?</h5>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="addQueue" type="button" class="btn btn-primary yn-btn">Yes</button>
+                <button type="button" class="btn btn-secondary yn-btn" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-container">
+    <div class="row">
+        <div class="aling-self-start col-3 criteria-div">
+            <div class="row">
+                <div class="separate-div col">
+                    <a asp-action="Content" asp-controller="Room" asp-route-id=@ViewContext.RouteData.Values["id"]>
+                        <button type="button" class="btn btn-primary my-back-btn">Back</button>
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="separate-div">
+                    <input id="room-cri" class="my-input criteria-input" type="text" placeholder="Queue name"/>
+                </div>
+            </div>
+            </br>
+            <div class="row">
+                <div class="separate-div separate-div-no-col">
+                    <div class="content-div my-content-label-dib"><p>Participants:</p></div>
+                </div>
+                <div id="participants-list" class="separate-div-no-col">
+                </div>
+            </div>
+        </div>
+        <div id="room-for-join-holder" class="flex-fill ml-5">
+        @foreach (var item in Model)
+        {
+            <div class="separate-div room-for-join-div">
+                <p id="queueId-@item.Id" class="hidden-p" hidden>@item.Id</p>
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col content-div"><p class="room-name">@item.Name</p></div>
+                            <div class="col-4 content-div">
+                                <p class="admin-name">Creator: [will be added]</p><br/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col content-div"><p>Start: @item.StartAt.ToString("dd.mm.yyyy") at @item.StartAt.ToString("HH:mm")</p></div>
+                            <div class="col content-div company-name"><p>Number of participants: </p><p class="num-of-participants">@item.QueueUser.Count()</p></div>
+                            <div class="col join-btn-holder">
+                                <button class="btn btn-primary join-room-btn show-participants-btn"> Show all participants</button>
+                                </div>
+                            <div class="col join-btn-holder">
+                                @if (item.QueueUser.Any(qu => qu.User == ViewBag.User))
+                                {
+                                    <button class="btn btn-primary join-room-btn join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter" disabled>Join</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-primary join-room-btn join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter">Join</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        </div>
+    </div>
+</div>

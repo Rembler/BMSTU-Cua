@@ -72,5 +72,24 @@ namespace Cua.Controllers
             Console.Write("No such user or room");
             return Json(null);
         }
+
+        // [Route("/Room/{id}")]
+        public IActionResult Content(int id)
+        {
+            Room room = db.Rooms.Include(r => r.Users).Include(r => r.Admin).FirstOrDefault(r => r.Id == id);
+            return View(room);
+        }
+
+        public async Task<IActionResult> Queues(int id)
+        {
+            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            ViewBag.User = user;
+            List<Queue> queues = await db.Queues
+                .Include(q => q.QueueUser)
+                .ThenInclude(qu => qu.User)
+                .Where(q => q.RoomId == id)
+                .ToListAsync();
+            return View(queues);
+        }
     }
 }

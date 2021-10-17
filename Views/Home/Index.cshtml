@@ -8,7 +8,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content separate-div modal-div">
             <div class="modal-header">
-                <div class="room-content content-modal-header">
+                <div class="content-div content-modal-header">
                     <h5 class="modal-title" id="exampleModalLongTitle">Want to create or join a room?</h5>
                 </div>
             </div>
@@ -48,12 +48,13 @@
 
 @foreach (var item in Model)
 {
+    <a asp-controller="Room" asp-action="Content" asp-route-id=@item.Id>
     <div class="container separate-div">
         <div class="row">
             <div class="col">
                 <div class="row">
-                    <div class="col-8 room-content"><p class="room-name">@item.Name</p></div>
-                    <div class="col room-content">
+                    <div class="col-8 content-div"><p class="room-name">@item.Name</p></div>
+                    <div class="col content-div">
                         @if (item.Admin.Email == ViewBag.CurrentUser)
                         {
                             <p class="admin-name">Admin: me</p>
@@ -67,8 +68,8 @@
                 <div class="row">
                     <div class="col">
                         <div class="row">
-                            <div class="col room-content"><p>Organization: @item.Company</p></div>
-                            <div class="col room-content"><p>Number of participants: @item.Users.Count()</p></div>
+                            <div class="col content-div"><p>Organization: @item.Company</p></div>
+                            <div class="col content-div"><p>Number of participants: @item.Users.Count()</p></div>
                         </div>
                     </div>
                     <div class="col-2">
@@ -96,16 +97,29 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col room-content room-activity">цщуц</div>
-                    <div class="col room-content room-activity">цщуц</div>
-                    <div class="col room-content room-activity">цщуц</div>
-                </div>
-                <div class="row">
-                    <div class="col room-content room-activity">цщуц</div>
-                </div>
+                @{ int index = 0; }
+                @foreach (var queue in item.Queues)
+                {
+                    if (index % 2 == 0)
+                    {
+                        @Html.Raw("<div class=\"row\">");
+                    }
+                    <div class="col content-div room-activity">
+                        <p>Queue "@queue.Name" (Start: @queue.StartAt.ToString("dd.mm.yyyy") at @queue.StartAt.ToString("HH:mm"))</p>
+                    </div>
+                    if (index % 2 != 0)
+                    {
+                        @Html.Raw("</div>");
+                    }
+                    index++;
+                }
+                @if (index % 2 != 0)
+                {
+                    @Html.Raw("</div>");
+                }
             </div>
         </div>
     </div>
+    </a>
 }
 </div>

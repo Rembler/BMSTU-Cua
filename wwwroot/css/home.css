@@ -9,6 +9,7 @@
     /* min-height: 250px; */
     font-size: 18px;
     margin-bottom: 15px;
+    width: 100%;
 }
 
 .room-participants {
@@ -17,7 +18,7 @@
     padding-left: 10px;
 }
 
-.room-content {
+.content-div {
     background-color: #35495a;
     color: white;
     border-radius: 15px;
@@ -28,10 +29,10 @@
 }
 
 .room-activity {
-    max-width: 33.33%;
+    max-width: 547px;
 }
 
-div.room-content p {
+div.content-div p {
     vertical-align: middle;
     display: table-cell;
 }
@@ -120,7 +121,7 @@ div.dropdown {
     color: white
 }
 
-.room-content.content-modal-header {
+.content-div.content-modal-header {
     margin: 0;
     height: 50px;
     text-align: center;

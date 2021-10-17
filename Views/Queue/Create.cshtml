@@ -1,0 +1,29 @@
+@model Cua.ViewModels.CreateQueueModel
+
+<div class="container my-create-room-container separate-div">
+<form class="login" asp-action="Create" asp-controller="Queue" asp-anti-forgery="true">
+    <h2 class="sr-only">Create queue form</h2>
+    <div class="validation" asp-validation-summary="ModelOnly"></div>
+    <div class="form-group my-create-input-div">
+        <input class="my-input" type="text" asp-for="Name" placeholder="Name" />
+        <span asp-validation-for="Name"></span>
+    </div>
+    <div class="form-group my-create-input-div">
+        <input class="my-input" type="number" asp-for="Limit" placeholder="Maximum number of participants" />
+        <span asp-validation-for="Limit"></span>
+    </div>
+    <div class="form-group my-create-input-div">
+        <input class="my-input" asp-for="StartAt"  asp-format="{0:yyyy-MM-ddTHH:mm}" value=@DateTime.Now.ToString("yyyy-MM-ddTHH:mm") />
+        <span asp-validation-for="StartAt"></span>
+    </div>
+    <div class="form-group">
+        <input type="hidden" asp-for="RoomId" value=@Model.RoomId />
+    </div>
+    <div class="form-group row">
+        <a class="my-create-room-back-link" asp-controller="Room" asp-action="Content" asp-route-id=@Model.RoomId>
+            <button type="button" class="btn btn-secondary my-create-room-back-btn">Back</button>
+        </a>
+        <input class="btn btn-primary my-create-room-btn" type="submit" value="Create" />
+    </div>
+</form>
+</div>

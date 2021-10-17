@@ -3,22 +3,6 @@
 
 // Write your JavaScript code.
 
-function addUser(id) {
-    
-    $.post("/Room/AddUser", { id: id })
-        .done(function (data) {
-            
-            if (data != null) {
-                var result_str = "<p>"+data+"</p>";
-                console.log(data);
-
-                // $(`#users-list-${id}`).html(result_str);
-                $(`#users-list-${id}`).append(result_str);
-                console.log(data);
-            }
-        });
-}
-
 $(".join-room-btn").click(function() {
 
     var room = $(this).closest(".room-for-join-div");
@@ -39,6 +23,32 @@ $("#addRoom").click(function() {
                 $("#exampleModalCenter").modal("toggle");
                 var toDel = $(`#roomId-${roomId}`).closest(".room-for-join-div");
                 toDel.remove();
+            }
+        })
+});
+
+$("#addQueue").click(function() {
+
+    var queueId = $("#got-id").text();
+    // console.log(roomId + " " + queueId)
+    $.post("/Queue/AddUser", { id: queueId})
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+                $("#exampleModalCenter").modal("toggle");
+
+                var queueDiv = $(`#queueId-${queueId}`).closest(".room-for-join-div");
+
+                var toInc = queueDiv.find(".num-of-participants");
+                
+                toInc.text(function(i, oldVal) {
+                    return parseInt(oldVal, 10) + 1;
+                });
+
+                var btn = queueDiv.find(".join-queue-btn").prop("disabled", true);
             }
         })
 });
@@ -110,7 +120,7 @@ $("#created-joined").click(function() {
     $("#direction").text(direction)
 });
 
-$(".find-room-input").keyup(function() {
+$(".my-input").keyup(function() {
 
     var searchFor = $(this).val();
     var $rooms = $(".room-holder"),
@@ -188,4 +198,29 @@ $("#private-checkbox").click(function() {
             $(this).show();
         }
     });
+});
+
+$(".show-participants-btn").click(function() {
+
+    var room = $(this).closest(".room-for-join-div");
+    var roomId = room.find(".hidden-p").text();
+
+    $.post("/Queue/GetParticipants", { id: roomId })
+        .done(function(data) {
+
+            var list = $("#participants-list");
+            list.empty();
+
+
+            if (data.length == 0) {
+                list.removeClass("separate-div")
+            }
+
+            for (let index = 0; index < data.length; index++) {
+                const element = data[index];
+                var newEl = $(`<div class=\"content-div my-participant-div\"><p>${element}</p></div>`);
+                list.attr("class", "separate-div separate-div-no-col");
+                list.append(newEl);
+            }
+        });
 });

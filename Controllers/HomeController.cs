@@ -30,11 +30,15 @@ namespace Cua.Controllers
             List<Room> roomsList = db.Rooms
                 .Include(r => r.Admin)
                 .Include(r => r.Users)
+                .Include(r => r.Queues)
+                .AsSplitQuery()
                 .Where(r => r.Admin == user)
                 .ToList();
             roomsList = roomsList.Concat(db.Rooms
                 .Include(r => r.Admin)
                 .Include(r => r.Users)
+                .Include(r => r.Queues)
+                .AsSplitQuery()
                 .Where(r => r.Users.Contains(user))
                 .ToList()).ToList();
             ViewBag.CurrentUser = user.Email;

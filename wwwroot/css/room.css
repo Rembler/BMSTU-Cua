@@ -1,0 +1,35 @@
+.my-content-div-container {
+    max-width: 90%;
+}
+
+.separate-div-no-col {
+    padding: 8px;
+}
+
+.my-content-label-dib {
+    width: 96%;
+}
+
+.my-content-label-dib p {
+    text-align: center;
+}
+
+.my-participant-div {
+    padding: 0 10px;
+}
+
+.my-show-queues-btn-holder {
+    padding: 0 10px;
+}
+
+.my-qs-btn {
+    width: 100%;
+}
+
+.join-room-btn:disabled {
+    background-color: #214A71;
+}
+
+.my-back-btn {
+    width: 100%;
+}

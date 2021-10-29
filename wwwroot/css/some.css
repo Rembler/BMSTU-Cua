@@ -40,6 +40,10 @@
     color: #2980ef;
 }
 
+.nav-illustration {
+    padding: 0;
+}
+
 .join-room-btn {
     width: 100%;
     height: 40px;

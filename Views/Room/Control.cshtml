@@ -1,0 +1,57 @@
+@model Cua.ViewModels.ControlPanelModel
+
+<div class="container-fluid my-content-div-container">
+    <div class="row">
+        <div class="col">
+            <div class="separate-div separate-div-no-col">
+                <div class="content-div my-content-label-div"><p>Participants:</p></div>
+            </div>
+            <div class="separate-div separate-div-no-col">
+                @foreach (var item in Model.Room.Users)
+                {
+                    <div class="content-div my-participant-div"><p>@item.Name @item.Surname</p></div>
+                }
+            </div>
+        </div>
+        <div class="col-5">
+            <div class="separate-div">
+                <div class="row">
+                    <div class="col-7 content-div"><p>@Model.Room.Name</p></div>
+                    <div class="col content-div"><p>@Model.Room.Company</p></div>
+                </div>
+                <div class="row">
+                    <div class="col content-div"><p>@Model.Room.About</p></div>
+                </div>
+            </div>
+            <div class="separate-div">
+                <div class="row">
+                    <div class="col-6 my-show-queues-btn-holder">
+                        <a asp-action="Queues" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">View all queues</button></a>
+                    </div>
+                    <div class="col-6 my-show-queues-btn-holder">
+                        <a asp-action="Create" asp-controller="Queue" asp-route-roomId=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Create queue</button></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="separate-div separate-div-no-col">
+                <div class="content-div my-content-label-div"><p>Active requests:</p></div>
+                <div class="separate-div separate-div-no-col">
+                @foreach (var item in Model.Requests)
+                {
+                    <div class="my-request-div">
+                        <div class="content-div my-participant-div">
+                            <p class="request-id" hidden>@item.User.Id</p>
+                            <p>Name: @item.User.Name @item.User.Surname; Comment: @item.Comment</p>
+                        </div>
+                        <button type="button" class="btn btn-primary request-btn acceptRequest">Accept</button>
+                        <button type="button" class="btn btn-secondary declineRequest" data-dismiss="modal">Decline</button>
+                    </div>
+                }
+            </div>
+                @* <div><a asp-controller="Queue" asp-action="Create" asp-route-roomId=@Model.Id><button type="button"></button></a></div> *@
+            </div>
+        </div>
+    </div>
+</div>

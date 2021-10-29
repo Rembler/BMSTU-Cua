@@ -6,11 +6,11 @@
     padding: 8px;
 }
 
-.my-content-label-dib {
+.my-content-label-div {
     width: 96%;
 }
 
-.my-content-label-dib p {
+.my-content-label-div p {
     text-align: center;
 }
 
@@ -32,4 +32,8 @@
 
 .my-back-btn {
     width: 100%;
+}
+
+.request-btn {
+    margin-left: 8px;
 }

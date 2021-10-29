@@ -16,10 +16,29 @@
         <nav class="navbar navbar-dark my-navbar">
             <div class="container-fluid">
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Cua</a>
+            <div class="illustration nav-illustration">
+                <a class="justify-content-center" href="#" onclick="return false;" data-toggle="modal" data-target="#notificationModal"><ion-icon name="mail-outline"></ion-icon></a>
+            </div>
             <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
             </div>
         </nav>
     </header>
+
+    <div class="modal fade" id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content separate-div modal-div">
+                <div class="modal-header">
+                    <div class="content-div content-modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Want to create or join a room?</h5>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a asp-controller="Room" asp-action="Create"><button type="button" class="btn btn-primary cj-btn">Create</button></a>
+                    <a asp-controller="Room" asp-action="Join"><button type="button" class="btn btn-primary cj-btn">Join</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="container-fluid">
         <main role="main">

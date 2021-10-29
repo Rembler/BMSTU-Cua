@@ -35,7 +35,7 @@
             </br>
             <div class="row">
                 <div class="separate-div separate-div-no-col">
-                    <div class="content-div my-content-label-dib"><p>Participants:</p></div>
+                    <div class="content-div my-content-label-div"><p>Participants:</p></div>
                 </div>
                 <div id="participants-list" class="separate-div-no-col">
                 </div>
@@ -51,11 +51,11 @@
                         <div class="row">
                             <div class="col content-div"><p class="room-name">@item.Name</p></div>
                             <div class="col-4 content-div">
-                                <p class="admin-name">Creator: [will be added]</p><br/>
+                                <p class="admin-name">Creator: @item.Creator.Name @item.Creator.Surname</p><br/>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col content-div"><p>Start: @item.StartAt.ToString("dd.mm.yyyy") at @item.StartAt.ToString("HH:mm")</p></div>
+                            <div class="col content-div"><p>Start: @item.StartAt.ToString("dd.MM.yyyy") at @item.StartAt.ToString("HH:mm")</p></div>
                             <div class="col content-div company-name"><p>Number of participants: </p><p class="num-of-participants">@item.QueueUser.Count()</p></div>
                             <div class="col join-btn-holder">
                                 <button class="btn btn-primary join-room-btn show-participants-btn"> Show all participants</button>

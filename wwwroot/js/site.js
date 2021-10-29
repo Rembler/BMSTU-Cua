@@ -8,6 +8,7 @@ $(".join-room-btn").click(function() {
     var room = $(this).closest(".room-for-join-div");
     var roomId = room.find(".hidden-p").text();
     $("#got-id").text(roomId);
+    $("#got-id-for-request").text(roomId);
 });
 
 $("#addRoom").click(function() {
@@ -20,9 +21,63 @@ $("#addRoom").click(function() {
                 console.log("Status: FAIL");
             } else {
                 console.log("Status: " + data);
-                $("#exampleModalCenter").modal("toggle");
+                $("#roomJoinModal").modal("toggle");
                 var toDel = $(`#roomId-${roomId}`).closest(".room-for-join-div");
                 toDel.remove();
+            }
+        })
+});
+
+$("#sendRequest").click(function() {
+
+    var roomId = $("#got-id-for-request").text();
+    var comment = $("#comment-input").val();
+    $.post("/Room/AddRequest", { id: roomId, comment: comment })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+                $("#privateRoomJoinModal").modal("toggle");
+                var toDeactivate = $(`#roomId-${roomId}`).closest(".room-for-join-div").find(".join-room-btn");
+                toDeactivate.prop("disabled", true);
+            }
+        })
+});
+
+$(".acceptRequest").click(function() {
+
+    var currentDiv = $(this).closest(".my-request-div")
+    var userId = currentDiv.find(".request-id").text();
+    var url = window.location.href;
+    var roomId = url.substring(url.lastIndexOf('/') + 1);
+    $.post("/Room/AddUser", { id: roomId, userId: userId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+                currentDiv.remove();
+            }
+        })
+});
+
+$(".declineRequest").click(function() {
+
+    var currentDiv = $(this).closest(".my-request-div")
+    var userId = currentDiv.find(".request-id").text();
+    var url = window.location.href;
+    var roomId = url.substring(url.lastIndexOf('/') + 1);
+    $.post("/Room/Decline", { id: roomId, userId: userId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+                currentDiv.remove();
             }
         })
 });

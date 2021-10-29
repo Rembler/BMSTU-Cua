@@ -1,6 +1,6 @@
 @model IEnumerable<Room>
 
-<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="roomJoinModal" tabindex="-1" role="dialog" aria-labelledby="roomJoinTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <p id="got-id" hidden></p>
         <div class="modal-content separate-div modal-div">
@@ -11,6 +11,26 @@
             </div>
             <div class="modal-footer">
                 <button id="addRoom" type="button" class="btn btn-primary yn-btn">Yes</button>
+                <button type="button" class="btn btn-secondary yn-btn" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="privateRoomJoinModal" tabindex="-1" role="dialog" aria-labelledby="privateRoomJoinTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <p id="got-id-for-request" hidden></p>
+        <div class="modal-content separate-div modal-div">
+            <div class="modal-header">
+                <div class="content-div content-modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Want to send a request for join?</h5>
+                </div>
+            </div>
+            <div class="modal-body">
+                <input id="comment-input" type="text" class="my-input" placeholder="Leave a comment for room admin" />
+            </div>
+            <div class="modal-footer">
+                <button id="sendRequest" type="button" class="btn btn-primary yn-btn">Yes</button>
                 <button type="button" class="btn btn-secondary yn-btn" data-dismiss="modal">No</button>
             </div>
         </div>
@@ -29,6 +49,7 @@
         </div>
     </div>
     <div id="room-for-join-holder" class="flex-fill ml-5">
+    @{ List<Request> requests = ViewBag.Requests; }
     @foreach (var item in Model)
     {
         @if (!item.Hidden)
@@ -64,7 +85,21 @@
                     <div class="row">
                         <div class="col content-div company-name"><p>Organization: @item.Company</p></div>
                         <div class="col content-div"><p>Number of participants: @item.Users.Count()</p></div>
-                        <div class="col join-btn-holder"><button class="btn btn-primary join-room-btn" data-toggle="modal" data-target="#exampleModalCenter">Join</button></div>
+                        @if (item.Private)
+                        {
+                            if (requests.Any(r => r.Room == item && r.Checked == false))
+                            {
+                                <div class="col join-btn-holder"><button class="btn btn-primary join-room-btn" data-toggle="modal" data-target="#privateRoomJoinModal" disabled>Join</button></div>
+                            }
+                            else
+                            {
+                                <div class="col join-btn-holder"><button class="btn btn-primary join-room-btn" data-toggle="modal" data-target="#privateRoomJoinModal">Join</button></div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col join-btn-holder"><button class="btn btn-primary join-room-btn" data-toggle="modal" data-target="#roomJoinModal">Join</button></div>
+                        }
                     </div>
                 </div>
             </div>

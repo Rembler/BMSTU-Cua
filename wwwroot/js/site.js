@@ -303,6 +303,8 @@ $(".show-participants-btn").click(function() {
         });
 });
 
+//  кнопка смены статуса очереди - отправляет пост запрос на сервер который меняет
+//  статус очереди на противоположный
 $(".change-active-status").click(function() {
 
     var clickedBtn = $(this);

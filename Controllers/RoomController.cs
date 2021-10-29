@@ -130,7 +130,13 @@ namespace Cua.Controllers
         // [Route("/Room/{id}")]
         public IActionResult Content(int id)
         {
-            Room room = db.Rooms.Include(r => r.Users).Include(r => r.Admin).FirstOrDefault(r => r.Id == id);
+            Room room = db.Rooms
+                .Include(r => r.Users)
+                .Include(r => r.Admin)
+                .Include(r => r.Queues)
+                .AsSplitQuery()
+                .FirstOrDefault(r => r.Id == id);
+            ViewBag.CurrentUser = db.Users.FirstOrDefault(u => u.Email == HttpContext.User.Identity.Name);
             return View(room);
         }
 
@@ -145,7 +151,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Queues(int id)
         {
             User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
-            ViewBag.User = user;
+            ViewBag.CurrentUser = user;
             List<Queue> queues = await db.Queues
                 .Include(q => q.Creator)
                 .Include(q => q.QueueUser)

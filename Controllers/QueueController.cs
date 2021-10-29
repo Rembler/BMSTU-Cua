@@ -79,5 +79,23 @@ namespace Cua.Controllers
             List<String> userNames = QueueUser.Select(qu => qu.User.Name + " " + qu.User.Surname).ToList();
             return Json(userNames);
         }
+
+        public JsonResult ChangeActiveStatus(int id)
+        {
+            Queue queue = db.Queues.Find(id);
+
+            if (queue != null)
+            {
+                queue.Active = !queue.Active;
+                db.Queues.Update(queue);
+                db.SaveChanges();
+                return Json("OK");
+            }
+            else
+            {
+                Console.Write("Can't find queue with ID = " + id);
+                return Json(null);
+            }
+        }
     }
 }

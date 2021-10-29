@@ -3,6 +3,8 @@
 
 // Write your JavaScript code.
 
+//  кнопка на странице доступных комнат - перекидывает айди комнаты из скрытого текста на карточке
+//  в скрытый текст на модальном окне
 $(".join-room-btn").click(function() {
 
     var room = $(this).closest(".room-for-join-div");
@@ -11,6 +13,8 @@ $(".join-room-btn").click(function() {
     $("#got-id-for-request").text(roomId);
 });
 
+//  кнопка добавить комнату - отправляет пост запрос на сервер который устанавливает связь между 
+//  данной комнатой и текущим пользователем
 $("#addRoom").click(function() {
 
     var roomId = $("#got-id").text();
@@ -28,6 +32,8 @@ $("#addRoom").click(function() {
         })
 });
 
+//  кнопка отправить запрос - появляется вместо кнопки добавить комнату если комната приватная -
+//  отправляет пост запрос на сервер который создает или обновляет запись в таблице запросов
 $("#sendRequest").click(function() {
 
     var roomId = $("#got-id-for-request").text();
@@ -46,6 +52,9 @@ $("#sendRequest").click(function() {
         })
 });
 
+//  кнопка на странице управления для одобрения запроса - отправляет пост запрос на сервер который 
+//  устанавливает связь между данной комнатой и пользователем оставившем заявку и обновляет
+//  статус запроса в таблице запросов
 $(".acceptRequest").click(function() {
 
     var currentDiv = $(this).closest(".my-request-div")
@@ -64,6 +73,8 @@ $(".acceptRequest").click(function() {
         })
 });
 
+//  другая кнопка на странице управления - отправляет пост запрос на сервер который только
+//  обновляет статус запроса в таблице запросов
 $(".declineRequest").click(function() {
 
     var currentDiv = $(this).closest(".my-request-div")
@@ -82,6 +93,8 @@ $(".declineRequest").click(function() {
         })
 });
 
+//  кнопка на странице очередей комнаты - отправляет пост запрос на сервер который устанавливает
+//  связь между текущим пользователем и данной очередью
 $("#addQueue").click(function() {
 
     var queueId = $("#got-id").text();
@@ -108,7 +121,8 @@ $("#addQueue").click(function() {
         })
 });
 
-
+//  вариант в контекстном меню на главной странице который позволяет отсортировать комнаты
+//  по их названию
 $("#name").click(function() {
 
     var direction = parseInt($("#direction").text());
@@ -142,6 +156,8 @@ $("#name").click(function() {
     $("#direction").text(direction)
 });
 
+//  вариант в контекстном меню на главной странице который позволяет отсортировать комнаты
+//  по критерию "создал - присоединился"
 $("#created-joined").click(function() {
 
     var direction = parseInt($("#direction").text());
@@ -175,6 +191,7 @@ $("#created-joined").click(function() {
     $("#direction").text(direction)
 });
 
+//  инпут на главной странице реализующий поиск комнат по имени
 $(".my-input").keyup(function() {
 
     var searchFor = $(this).val();
@@ -191,6 +208,7 @@ $(".my-input").keyup(function() {
     });
 });
 
+//  инпут на странице доступных комнат реализующий поиск комнат по имени
 $("#room-cri").keyup(function() {
 
     var searchFor = $(this).val();
@@ -207,6 +225,7 @@ $("#room-cri").keyup(function() {
     });
 });
 
+//  инпут на странице доступных комнат реализующий поиск комнат по имени админа
 $("#admin-cri").keyup(function() {
 
     var searchFor = $(this).val();
@@ -223,6 +242,7 @@ $("#admin-cri").keyup(function() {
     });
 });
 
+//  инпут на странице доступных комнат реализующий поиск комнат по названию компании
 $("#company-cri").keyup(function() {
 
     var searchFor = $(this).val();
@@ -239,6 +259,7 @@ $("#company-cri").keyup(function() {
     });
 });
 
+//  чекбокс на странице доступных комнат отображающий только приватные комнаты
 $("#private-checkbox").click(function() {
 
     var status = $(this).is(":checked");
@@ -255,12 +276,14 @@ $("#private-checkbox").click(function() {
     });
 });
 
+//  кнопка на карточке очереди - отправляет пост запрост на сервер который возвращает
+//  полный список участников этой очереди
 $(".show-participants-btn").click(function() {
 
     var room = $(this).closest(".room-for-join-div");
-    var roomId = room.find(".hidden-p").text();
+    var queueId = room.find(".hidden-p").text();
 
-    $.post("/Queue/GetParticipants", { id: roomId })
+    $.post("/Queue/GetParticipants", { id: queueId })
         .done(function(data) {
 
             var list = $("#participants-list");
@@ -278,4 +301,26 @@ $(".show-participants-btn").click(function() {
                 list.append(newEl);
             }
         });
+});
+
+$(".change-active-status").click(function() {
+
+    var clickedBtn = $(this);
+    var queueId = $(this).closest(".room-for-join-div").find(".hidden-p").text();
+
+    $.post("/Queue/ChangeActiveStatus", { id: queueId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+
+                if (clickedBtn.text() == "Start") {
+                    clickedBtn.text("Stop");
+                } else {
+                    clickedBtn.text("Start");
+                }
+            }
+        })
 });

@@ -29,16 +29,27 @@
                     <div class="col-6 my-show-queues-btn-holder">
                         <a asp-action="Queues" asp-controller="Room" asp-route-id=@Model.Id><button type="button" class="btn btn-primary my-qs-btn">View all queues</button></a>
                     </div>
-                    <div class="col-6 my-show-queues-btn-holder">
-                        <a asp-action="Create" asp-controller="Queue" asp-route-roomId=@Model.Id><button type="button" class="btn btn-primary my-qs-btn">Create queue</button></a>
-                    </div>
+                    @if (ViewBag.CurrentUser == Model.Admin)
+                    {
+                        <div class="col-6 my-show-queues-btn-holder">
+                            <a asp-action="Control" asp-controller="Room" asp-route-id=@Model.Id><button type="button" class="btn btn-primary my-qs-btn">Control panel</button></a>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
         <div class="col">
             <div class="separate-div separate-div-no-col">
                 <div class="content-div my-content-label-div"><p>Active queues:</p></div>
-                @* <div><a asp-controller="Queue" asp-action="Create" asp-route-roomId=@Model.Id><button type="button"></button></a></div> *@
+            </div>
+            <div class="separate-div separate-div-no-col">
+                @foreach (var item in Model.Queues)
+                {
+                    if (item.Active)
+                    {
+                        <div class="content-div my-participant-div"><p>@item.Name (@item.QueueUser.Count())</p></div>
+                    }
+                }
             </div>
         </div>
     </div>

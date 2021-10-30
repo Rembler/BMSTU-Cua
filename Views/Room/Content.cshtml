@@ -1,5 +1,24 @@
 @model Cua.Models.Room
 
+<div class="modal fade" id="queueControlModal" tabindex="-1" role="dialog" aria-labelledby="queueControlModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content separate-div modal-div">
+            <div class="modal-header">
+                <div class="content-div content-modal-header">
+                    <h5 class="modal-title" id="queueControlModalTitle">Queue control</h5>
+                </div>
+            </div>
+            <div class="modal-body">
+                <button id="remove-first-user" type="button" class="btn btn-primary">Remove first user</button><br/>
+            </div>
+            <div class="modal-footer">
+                <p id="queue-id" hidden></p>
+                <div id="my-queue-members"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container-fluid my-content-div-container">
     <div class="row">
         <div class="col">
@@ -47,7 +66,14 @@
                 {
                     if (item.Active)
                     {
-                        <div class="content-div my-participant-div"><p>@item.Name (@item.QueueUser.Count())</p></div>
+                        <div class="content-div my-participant-div">
+                            <p>@item.Name</p>
+                            <p id="user-count-@item.Id" class="my-user-count">(@item.QueueUser.Count())</p>
+                            <p class="queue-id" hidden>@item.Id</p>
+                            <a class="queue-control" href="#" onclick="return false;" data-toggle="modal" data-target="#queueControlModal">
+                                <ion-icon name="settings-outline"></ion-icon>
+                            </a>
+                        </div>
                     }
                 }
             </div>

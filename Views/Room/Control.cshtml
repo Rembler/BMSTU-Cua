@@ -9,27 +9,44 @@
             <div class="separate-div separate-div-no-col">
                 @foreach (var item in Model.Room.Users)
                 {
-                    <div class="content-div my-participant-div"><p>@item.Name @item.Surname</p></div>
+                    <div class="content-div my-participant-div">
+                        <p>@item.Name @item.Surname</p>
+                        <p class="user-id" hidden>@item.Id</p>
+                        <a class="delete-user" href="#" onclick="return false;"><ion-icon name="close-outline"></ion-icon></a>
+                    </div> 
                 }
             </div>
         </div>
         <div class="col-5">
             <div class="separate-div">
                 <div class="row">
-                    <div class="col-7 content-div"><p>@Model.Room.Name</p></div>
-                    <div class="col content-div"><p>@Model.Room.Company</p></div>
+                    <div class="col-7 my-control-input-holder" style="display: none;">
+                        <input id="room-name-input" type="text" class="my-input" value=@Model.Room.Name placeholder="Room name" />
+                    </div>
+                    <div id="name-info" class="col-7 content-div my-info-div"><p>@Model.Room.Name</p></div>
+                    <div class="col my-control-input-holder" style="display: none;">
+                        <input id="company-name-input" type="text" class="my-input" value=@Model.Room.Company placeholder="Company" />
+                    </div>
+                    <div id="company-info" class="col content-div my-info-div"><p>@Model.Room.Company</p></div>
                 </div>
                 <div class="row">
-                    <div class="col content-div"><p>@Model.Room.About</p></div>
+                    <div class="col my-control-input-holder" style="display: none;">
+                        <input id="about-input" type="text" class="my-input" value=@Model.Room.About placeholder="Short info" />
+                    </div>
+                    <div id="about-info" class="col content-div my-info-div"><p>@Model.Room.About</p></div>
                 </div>
             </div>
             <div class="separate-div">
                 <div class="row">
-                    <div class="col-6 my-show-queues-btn-holder">
-                        <a asp-action="Queues" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">View all queues</button></a>
+                    <div class="col-4 my-show-queues-btn-holder">
+                        <button type="button" class="btn btn-primary save-changes my-qs-btn" style="display: none;">Save changes</button>
+                        <button type="button" class="btn btn-primary change-description my-qs-btn">Change description</button>
                     </div>
-                    <div class="col-6 my-show-queues-btn-holder">
+                    <div class="col-4 my-show-queues-btn-holder">
                         <a asp-action="Create" asp-controller="Queue" asp-route-roomId=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Create queue</button></a>
+                    </div>
+                    <div class="col-4 my-show-queues-btn-holder">
+                        <a asp-action="Content" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Back to room</button></a>
                     </div>
                 </div>
             </div>
@@ -37,7 +54,8 @@
         <div class="col">
             <div class="separate-div separate-div-no-col">
                 <div class="content-div my-content-label-div"><p>Active requests:</p></div>
-                <div class="separate-div separate-div-no-col">
+            </div>
+            <div class="separate-div separate-div-no-col">
                 @foreach (var item in Model.Requests)
                 {
                     <div class="my-request-div">
@@ -49,7 +67,6 @@
                         <button type="button" class="btn btn-secondary declineRequest" data-dismiss="modal">Decline</button>
                     </div>
                 }
-            </div>
                 @* <div><a asp-controller="Queue" asp-action="Create" asp-route-roomId=@Model.Id><button type="button"></button></a></div> *@
             </div>
         </div>

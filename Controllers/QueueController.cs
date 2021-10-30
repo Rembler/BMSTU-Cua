@@ -55,7 +55,7 @@ namespace Cua.Controllers
             Queue queue = await db.Queues.FindAsync(id);
             List<QueueUser> alreadyIn = db.QueueUser.Where(qu => qu.Queue == queue).ToList();
 
-            int place = alreadyIn.Any() ? alreadyIn.Max(qu => qu.Place) : 1;
+            int place = alreadyIn.Any() ? alreadyIn.Max(qu => qu.Place) + 1 : 1;
             if (user != null && queue != null)
             {
                 // var roomUsers = db.Users.Where(u => u.Rooms.Any(r => r.Id == id)).ToList();
@@ -96,6 +96,62 @@ namespace Cua.Controllers
                 Console.Write("Can't find queue with ID = " + id);
                 return Json(null);
             }
+        }
+
+        public async Task<JsonResult> GetUsers(int id)
+        {
+            Queue queue = await db.Queues
+                .Include(q => q.QueueUser)
+                .ThenInclude(qu => qu.User)
+                .FirstOrDefaultAsync(q => q.Id == id);
+            
+            if (queue != null)
+            {
+                if (queue.QueueUser.Count() == 0)
+                    return Json(0);
+                else
+                {
+                    List<QueueMemberModel> queueMembers = new List<QueueMemberModel>();
+                    foreach (var item in queue.QueueUser)
+                    {
+                        queueMembers.Add(new QueueMemberModel { 
+                            Name = item.User.Name + " " + item.User.Surname,
+                            UserId = item.UserId,
+                            Place = item.Place 
+                        });
+                    }
+                    return Json(queueMembers); 
+                }                   
+            }
+            Console.Write("Can't find queue with ID = " + id);
+            return Json(null);
+        }
+
+        public async Task<JsonResult> RemoveUser(int id, int userId)
+        {
+            List<QueueUser> queueUsers = await db.QueueUser.Where(qu => qu.QueueId == id).ToListAsync();
+
+            if (queueUsers != null)
+            {
+                QueueUser removedUser = queueUsers.FirstOrDefault(qu => qu.UserId == userId);
+
+                if (removedUser != null)
+                {
+                    db.QueueUser.Remove(removedUser);
+                    queueUsers.Remove(removedUser);
+
+                    foreach (var item in queueUsers)
+                        item.Place--;
+                    db.QueueUser.UpdateRange(queueUsers);
+                    
+                    await db.SaveChangesAsync();
+                    return Json("OK");
+                }
+                Console.Write("User with ID = " + userId + " is not in the queue");
+                return Json(null);
+            }
+            Console.Write("Queue with ID = " + id + " doesn't have any members");
+            return Json(null);
         }
     }
 }

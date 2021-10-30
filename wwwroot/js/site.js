@@ -192,7 +192,7 @@ $("#created-joined").click(function() {
 });
 
 //  инпут на главной странице реализующий поиск комнат по имени
-$(".my-input").keyup(function() {
+$(".search-input").keyup(function() {
 
     var searchFor = $(this).val();
     var $rooms = $(".room-holder"),
@@ -323,6 +323,137 @@ $(".change-active-status").click(function() {
                 } else {
                     clickedBtn.text("Start");
                 }
+            }
+        })
+});
+
+$(".change-description").click(function() {
+
+    $(".my-info-div").hide();
+    $(".my-control-input-holder").show();
+    $(this).hide();
+    $(".save-changes").show();
+});
+
+$(".save-changes").click(function() {
+
+    var newName = $("#room-name-input").val();
+    var newCompany = $("#company-name-input").val();
+    var newAbout = $("#about-input").val();
+    var url = window.location.href;
+    var roomId = url.substring(url.lastIndexOf('/') + 1);
+
+    $.post("/Room/Update", { id: roomId, newName: newName, newCompany: newCompany, newAbout: newAbout })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+
+                $("#name-info > p").text(newName);
+                $("#company-info > p").text(newCompany);
+                $("#about-info > p").text(newAbout);
+                $(".my-info-div").show();
+
+                $("#room-name-input").val(newName);
+                $("#company-name-input").val(newCompany);
+                $("#about-input").val(newAbout);
+                $(".my-control-input-holder").hide();
+
+                $(".save-changes").hide();
+                $(".change-description").show();
+            }
+        })
+});
+
+$(".delete-user").click(function() {
+
+    var clickedUser = $(this).closest(".my-participant-div");
+    var userId = clickedUser.find(".user-id").text();
+    var url = window.location.href;
+    var roomId = url.substring(url.lastIndexOf('/') + 1);
+
+    $.post("/Room/DeleteUser", { id: roomId, userId: userId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+
+                clickedUser.remove();
+            }
+        })
+});
+
+$(".queue-control").click(function() {
+
+    var queueId = $(this).closest(".my-participant-div").find(".queue-id").text();
+    $("#queue-id").text(queueId);
+
+    $.post("/Queue/GetUsers", { id: queueId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: OK");
+
+                var target = $("#my-queue-members");
+                target.empty();
+
+                if (data == 0) {
+                    var infoDiv = $("<div></div>").addClass("content-div my-queue-member-holder");
+                    var infoP = $("<p></p>").text("No users are in queue");
+
+                    infoDiv.append(infoP);
+                    target.append(infoDiv);
+                    $("#remove-first-user").prop("disabled", true);
+                } else {
+                    data.sort((a, b) => (a.place > b.place ? 1 : -1));
+                    data.forEach(element => {
+                        var infoDiv = $("<div></div>").addClass("content-div my-queue-member-holder");
+                        var infoP = $("<p></p>").text(element.name);
+                        var hiddenP = $("<p></p>").addClass("queue-user-id").text(element.userId).hide();
+
+                        infoDiv.append(infoP);
+                        infoDiv.append(hiddenP);
+                        target.append(infoDiv);
+                    });
+                }
+            }
+        })
+});
+
+$("#remove-first-user").click(function() {
+
+    var toRemove = $("#my-queue-members").children(".my-queue-member-holder").eq(0);
+    var queueId = $("#queue-id").text();
+    var userId = toRemove.find(".queue-user-id").text();
+    
+    $.post("/Queue/RemoveUser", { id: queueId, userId: userId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: OK");
+
+                toRemove.remove();
+
+                if ($("#my-queue-members").children().length == 0) {
+                    var infoDiv = $("<div></div>").addClass("content-div my-queue-member-holder");
+                    var infoP = $("<p></p>").text("No users are in queue");
+
+                    infoDiv.append(infoP);
+                    $("#my-queue-members").append(infoDiv);
+                    $("#remove-first-user").prop("disabled", true);
+                }
+                
+                var counter = $(`#user-count-${queueId}`);
+                var userCount = parseInt(counter.text().substring(1, counter.text().length - 1)) - 1;
+                counter.text("(" + userCount + ")");
             }
         })
 });

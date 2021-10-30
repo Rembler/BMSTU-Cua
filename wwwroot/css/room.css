@@ -37,3 +37,24 @@
 .request-btn {
     margin-left: 8px;
 }
+
+.my-control-input-holder {
+    height: 40px;
+    margin: 8px;
+    padding: 0;
+}
+
+div.content-div a {
+    vertical-align: middle;
+    display: table-cell;
+    padding-left: 10px;
+    font-size: 30px;
+}
+
+div.content-div a.delete-user {
+    color: red;
+}
+
+div.content-div a.queue-control {
+    color: #007bff;
+}

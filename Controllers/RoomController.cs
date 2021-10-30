@@ -44,6 +44,23 @@ namespace Cua.Controllers
             return View(model);
         }
 
+        public async Task<JsonResult> Update(int id, string newName, string newCompany, string newAbout)
+        {
+            Room room = await db.Rooms.FindAsync(id);
+            if (room != null)
+            {
+                room.Name = newName;
+                room.Company = newCompany;
+                room.About = newAbout;
+
+                db.Rooms.Update(room);
+                await db.SaveChangesAsync();
+
+                return Json("OK");
+            }
+            return Json(null);
+        }
+
         public async Task<IActionResult> Join()
         {
             User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
@@ -102,6 +119,28 @@ namespace Cua.Controllers
             return Json(null);
         }
 
+        public async Task<JsonResult> DeleteUser(int id, int userId)
+        {
+            User user = await db.Users.FindAsync(userId);
+            Room room = await db.Rooms.Include(r => r.Users).FirstOrDefaultAsync(r => r.Id == id);
+            // Console.WriteLine($"User id: {user.Id}; room id: {room.Id}");
+
+            if (user != null && room != null)
+            {
+                if (room.Users.Contains(user))
+                {
+                    room.Users.Remove(user);
+                    db.Rooms.Update(room);
+                    await db.SaveChangesAsync();
+                    return Json("OK");
+                }
+                Console.Write("User isn't a member of the room");
+                return Json(null);
+            }
+            Console.Write($"User with ID = {user.Id} or room with ID = {room.Id} doesn't exist");
+            return Json(null);
+        }
+
         public async Task<JsonResult> AddRequest(int id, string comment)
         {
             User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
@@ -134,7 +173,9 @@ namespace Cua.Controllers
                 .Include(r => r.Users)
                 .Include(r => r.Admin)
                 .Include(r => r.Queues)
+                .ThenInclude(q => q.QueueUser)
                 .AsSplitQuery()
+                .OrderBy(r => r.Id)
                 .FirstOrDefault(r => r.Id == id);
             ViewBag.CurrentUser = db.Users.FirstOrDefault(u => u.Email == HttpContext.User.Identity.Name);
             return View(room);

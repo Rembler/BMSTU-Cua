@@ -457,3 +457,110 @@ $("#remove-first-user").click(function() {
             }
         })
 });
+
+$("#update-info").click(function() {
+
+    if($(this).text() == "Update information")
+    {
+        $(".info-holder").hide();
+        $(".general-input").show();
+        $("#update-info").text("Save changes");
+    } else {
+        newName = $("#new-name").val();
+        newSurname = $("#new-surname").val();
+        newCompany = $("#new-company").val();
+
+        if (newName == "" || newSurname == "" || newCompany == "") {
+            alert("Some fields are empty");
+        } else {
+            $.post("/Account/UpdateInfo", { name: newName, surname: newSurname, company: newCompany })
+                .done(function(data) {
+
+                    if (data == null) {
+                        console.log("Status: FAIL");
+                    } else {
+                        console.log("Status: OK");
+
+                        $("#p-name").text(newName);
+                        $("#p-surname").text(newSurname);
+                        $("#p-company").text(newCompany);
+
+                        $(".info-holder").show();
+                        $(".general-input").hide();
+                        $("#update-info").text("Update information");
+                    }
+                })
+        }
+    }
+});
+
+$("#update-email").click(function() {
+
+    if($(this).text() == "Update email") {
+        $(".email-holder").hide();
+        $(".email-input").show();
+        $("#update-email").text("Confirm email");
+    } else {
+        var email = $("#new-email").val();
+        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+        if (re.test(email.toLowerCase())) {
+            $.post("/Account/UpdateEmail", { email: email })
+                .done(function(data) {
+
+                    if (data == null) {
+                        console.log("Status: FAIL");
+                        alert("This email can't be chosen, try another one");
+                    } else {
+                        console.log("Status: OK");
+                        alert("Email changed successfully. Now check your email box to confirm it");
+
+                        $("#p-email").text(email);
+                    
+                        $(".email-holder").show();
+                        $(".email-input").hide();
+                        $("#update-email").text("Update email");
+                    }
+                })
+        } else {
+            alert("Incorrect email");
+        }
+    }
+});
+
+$("#update-password").click(function() {
+
+    if ($(this).text() == "Update password") {
+        $(".password-div").show();
+        $(this).text("Save password");
+    } else {
+        var passwd = $("#new-password").val();
+        var passwdConfirmation = $("#new-password-confirmation").val();
+
+        if (passwd.length < 6) {
+            alert("Password must contains at least 6 symbols");
+        } else {
+            if (passwd != passwdConfirmation) {
+                alert("Passwords are not the same");
+            } else {
+                $.post("/Account/UpdatePassword", { password: passwd })
+                    .done(function(data) {
+
+                        if (data == null) {
+                            console.log("Status: FAIL");
+                            alert("Something goes wrong");
+                        } else {
+                            console.log("Status: OK");
+
+                            $("#new-password").val("");
+                            $("#new-password-confirmation").val("");
+                            $(".password-div").hide();
+                            $("#update-password").text("Update password");
+
+                            alert("Password successfully changed");
+                        }
+                    })
+            }
+        }
+    }
+});

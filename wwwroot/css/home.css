@@ -164,3 +164,37 @@ div.dropdown {
     text-align: center;
     color: #2980ef;
 }
+
+.my-header-dropdown {
+    color: white;
+    background-color: transparent;
+}
+
+.show>.my-header-dropdown {
+    background-color: transparent;
+}
+
+.btn:hover {
+    color: white;
+}
+
+.my-account-info-div {
+    width: 700px;
+}
+
+.my-property-description p {
+    display: table-cell;
+    vertical-align: middle;
+    color: white;
+    text-align: right;
+}
+
+.my-property-description {
+    display: table;
+    margin: 8px;
+}
+
+.my-input-holder {
+    min-height: 40px;
+    margin: 8px
+}

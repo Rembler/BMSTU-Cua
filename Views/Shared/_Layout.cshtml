@@ -15,11 +15,19 @@
     <header>
         <nav class="navbar navbar-dark my-navbar">
             <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Cua</a>
-            <div class="illustration nav-illustration">
-                <a class="justify-content-center" href="#" onclick="return false;" data-toggle="modal" data-target="#notificationModal"><ion-icon name="mail-outline"></ion-icon></a>
-            </div>
-            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Cua</a>
+                <div class="illustration nav-illustration">
+                    <a class="justify-content-center" href="#" onclick="return false;" data-toggle="modal" data-target="#notificationModal"><ion-icon name="mail-outline"></ion-icon></a>
+                </div>
+                <div class="btn-group dropleft">
+                    <button class="btn dropdown-toggle my-header-dropdown" type="button" id="dropdownMenuHeaderButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        My account
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuHeaderButton">
+                        <a class="dropdown-item" asp-controller="Account" asp-action="Settings">Settings</a>
+                        <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>                                      
+                    </div>
+                </div>
             </div>
         </nav>
     </header>

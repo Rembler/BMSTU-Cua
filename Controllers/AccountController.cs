@@ -179,6 +179,81 @@ namespace Cua.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> Settings()
+        {
+            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            RegisterModel model = new RegisterModel() { 
+                Email = user.Email, Name = user.Name,
+                Surname = user.Surname, Company = user.Company,
+                Password = user.Password };
+            return View(model);
+        }
+
+        public async Task<JsonResult> UpdateInfo(string name, string surname, string company)
+        {
+            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+
+            user.Name = name;
+            user.Surname = surname;
+            user.Company = company;
+            db.Users.Update(user);
+            await db.SaveChangesAsync();
+
+            return Json("OK");
+        }
+
+        public async Task<JsonResult> UpdateEmail(string email)
+        {
+            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+
+            if (user.Email == email)
+            {
+                Console.Write("New email and old email are the same");
+                return Json(null);
+            } 
+            else
+            {
+                bool isNotUnique = await db.Users.AnyAsync(u => u.Email == email);
+                if (isNotUnique)
+                {
+                    Console.Write("User with email " + email + " already exists");
+                    return Json(null);
+                }
+                else
+                {
+                    user.Email = email;
+                    user.IsConfirmed = false;
+                    db.Users.Update(user);
+                    await db.SaveChangesAsync();
+
+                    var callbackUrl = Url.Action(
+                        "ConfirmEmail", "Account",
+                        new { userId = user.Id, token = user.ConfirmationToken },
+                        protocol: HttpContext.Request.Scheme);
+                    //  отправка письма
+                    await _mailService.SendEmailAsync(
+                        user.Email,
+                        "Подтверждение адреса электронной почты",
+                        $"Для подтверждения нового адреса электронной почты перейдите <a href='{callbackUrl}'>по ссылке</a>.");
+
+                    return Json("OK");
+                }
+            }
+        }
+
+        public async Task<JsonResult> UpdatePassword(string password)
+        {
+            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+
+            var hashsalt = EncryptPassword(password);
+            user.Password = hashsalt.Hash;
+            user.StoredSalt = hashsalt.Salt;
+            db.Users.Update(user);
+            await db.SaveChangesAsync();
+
+            return Json("OK");
+        }
+
         [HttpGet]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {

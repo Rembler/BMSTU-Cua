@@ -1,0 +1,60 @@
+@model Cua.ViewModels.RegisterModel
+
+
+<div class="container separate-div my-account-info-div">
+    <div class="row">
+        <div class="col-3 my-property-description"><p>Name</p></div>
+        <div class="content-div col info-holder"><p id="p-name">@Model.Name</p></div>
+        <div class="col my-input-holder general-input" style="display: none;">
+            <input id="new-name" class="my-input" type="text" placeholder="Name" value=@Model.Name />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3 my-property-description"><p>Surname</p></div>
+        <div class="content-div col info-holder"><p id="p-surname">@Model.Surname</p></div>
+        <div class="col my-input-holder general-input" style="display: none;">
+            <input id="new-surname" class="my-input" type="text" placeholder="Surname" value=@Model.Surname />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3 my-property-description"><p>Email</p></div>
+        <div class="content-div col email-holder"><p id="p-email">@Model.Email</p></div>
+        <div class="col my-input-holder email-input" style="display: none;">
+            <input id="new-email" class="my-input" type="text" placeholder="Email" value=@Model.Email />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3 my-property-description"><p>Organization</p></div>
+        <div class="content-div col info-holder"><p id="p-company">@Model.Company</p></div>
+        <div class="col my-input-holder general-input" style="display: none;">
+            <input id="new-company" class="my-input" type="text" placeholder="Organization" value=@Model.Company />
+        </div>
+    </div>
+</div>
+
+<div class="container separate-div my-account-info-div">
+    <div class="row">
+        <div class="col">
+            <button id="update-info" type="button" class="btn btn-primary my-qs-btn">Update information</button>
+        </div>
+        <div class="col">
+            <button id="update-email" type="button" class="btn btn-primary my-qs-btn">Update email</button>
+        </div>
+        <div class="col">
+            <button id="update-password" type="button" class="btn btn-primary my-qs-btn">Update password</button>
+        </div>
+    </div>
+</div>
+
+<div class="container separate-div my-account-info-div password-div" style="display: none;">
+    <div class="row">
+        <div class="col my-input-holder">
+            <input id="new-password" class="my-input" type="password" placeholder="Password" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col my-input-holder">
+            <input id="new-password-confirmation" class="my-input" type="password" placeholder="Confirm password" />
+        </div>
+    </div>
+</div>

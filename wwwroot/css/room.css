@@ -51,10 +51,14 @@ div.content-div a {
     font-size: 30px;
 }
 
-div.content-div a.delete-user {
+div.content-div a.delete-user, a.delete-queue {
     color: red;
 }
 
 div.content-div a.queue-control {
     color: #007bff;
+}
+
+.btn-danger {
+    font-size: 18px;
 }

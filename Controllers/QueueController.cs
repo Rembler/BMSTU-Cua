@@ -43,12 +43,28 @@ namespace Cua.Controllers
                 };
                 db.Queues.Add(queue);
                 await db.SaveChangesAsync();
-                return RedirectToAction("Content", "Room", new { id = model.RoomId });
+                return RedirectToAction("Control", "Room", new { id = model.RoomId });
             }
             return View(model);
         }
 
-        public async Task<JsonResult> AddUser(int id)
+        public async Task<JsonResult> Delete(int id)
+        {
+            Queue removedQueue = await db.Queues.FindAsync(id);
+            if (removedQueue != null)
+            {
+                List<QueueUser> removedQueueUsers = await db.QueueUser.Where(qu => qu.QueueId == id).ToListAsync();
+                db.QueueUser.RemoveRange(removedQueueUsers);
+                db.Queues.Remove(removedQueue);
+                await db.SaveChangesAsync();
+                
+                return Json("OK");
+            }
+            Console.Write("Can't find queue with ID = " + id);
+            return Json(null);
+        }
+
+        public async Task<JsonResult> Join(int id)
         {
             User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
             // Room room = await db.Rooms.FindAsync(roomId);
@@ -71,13 +87,6 @@ namespace Cua.Controllers
             }
             Console.Write("No such user or queue");
             return Json(null);
-        }
-
-        public JsonResult GetParticipants(int id)
-        {
-            List<QueueUser> QueueUser = db.QueueUser.Include(qu => qu.User).Where(qu => qu.QueueId == id).ToList();
-            List<String> userNames = QueueUser.Select(qu => qu.User.Name + " " + qu.User.Surname).ToList();
-            return Json(userNames);
         }
 
         public JsonResult ChangeActiveStatus(int id)
@@ -127,13 +136,20 @@ namespace Cua.Controllers
             return Json(null);
         }
 
-        public async Task<JsonResult> RemoveUser(int id, int userId)
+        public async Task<JsonResult> RemoveUser(int id, int? userId)
         {
             List<QueueUser> queueUsers = await db.QueueUser.Where(qu => qu.QueueId == id).ToListAsync();
 
             if (queueUsers != null)
             {
-                QueueUser removedUser = queueUsers.FirstOrDefault(qu => qu.UserId == userId);
+                QueueUser removedUser;
+                if (userId != null)
+                    removedUser = queueUsers.FirstOrDefault(qu => qu.UserId == userId);
+                else
+                {
+                    User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+                    removedUser = queueUsers.FirstOrDefault(qu => qu.UserId == user.Id);
+                }
 
                 if (removedUser != null)
                 {

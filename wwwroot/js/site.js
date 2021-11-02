@@ -98,8 +98,8 @@ $(".declineRequest").click(function() {
 $("#addQueue").click(function() {
 
     var queueId = $("#got-id").text();
-    // console.log(roomId + " " + queueId)
-    $.post("/Queue/AddUser", { id: queueId})
+
+    $.post("/Queue/Join", { id: queueId})
         .done(function(data) {
 
             if (data == null) {
@@ -116,9 +116,36 @@ $("#addQueue").click(function() {
                     return parseInt(oldVal, 10) + 1;
                 });
 
-                var btn = queueDiv.find(".join-queue-btn").prop("disabled", true);
+                queueDiv.find(".join-queue-btn").hide();
+                queueDiv.find(".leave-queue-btn").show();
             }
         })
+});
+
+$(".leave-queue-btn").click(function() {
+
+    var queueId = $("#got-id").text();
+
+    $.post("/Queue/RemoveUser", { id: queueId })
+    .done(function(data) {
+
+        if (data == null) {
+            console.log("Status: FAIL");
+        } else {
+            console.log("Status: OK");
+
+            var queueDiv = $(`#queueId-${queueId}`).closest(".room-for-join-div");
+
+            var toDec = queueDiv.find(".num-of-participants");
+            
+            toDec.text(function(i, oldVal) {
+                return parseInt(oldVal, 10) - 1;
+            });
+
+            queueDiv.find(".join-queue-btn").show();
+            queueDiv.find(".leave-queue-btn").hide();
+        }
+    })
 });
 
 //  вариант в контекстном меню на главной странице который позволяет отсортировать комнаты
@@ -283,20 +310,19 @@ $(".show-participants-btn").click(function() {
     var room = $(this).closest(".room-for-join-div");
     var queueId = room.find(".hidden-p").text();
 
-    $.post("/Queue/GetParticipants", { id: queueId })
+    $.post("/Queue/GetUsers", { id: queueId })
         .done(function(data) {
 
             var list = $("#participants-list");
             list.empty();
 
-
-            if (data.length == 0) {
+            if (data == 0) {
                 list.removeClass("separate-div")
             }
 
             for (let index = 0; index < data.length; index++) {
                 const element = data[index];
-                var newEl = $(`<div class=\"content-div my-participant-div\"><p>${element}</p></div>`);
+                var newEl = $(`<div class=\"content-div my-participant-div\"><p>${element.name}</p></div>`);
                 list.attr("class", "separate-div separate-div-no-col");
                 list.append(newEl);
             }
@@ -383,6 +409,24 @@ $(".delete-user").click(function() {
                 console.log("Status: " + data);
 
                 clickedUser.remove();
+            }
+        })
+});
+
+$(".delete-queue").click(function() {
+
+    var clickedQueue = $(this).closest(".my-participant-div");
+    var queueId = clickedQueue.find(".queue-id").text();
+
+    $.post("/Queue/Delete", { id: queueId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+
+                clickedQueue.remove();
             }
         })
 });

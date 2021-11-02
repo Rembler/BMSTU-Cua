@@ -66,7 +66,6 @@ namespace Cua.Controllers
             User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
             List<Room> rooms = db.Rooms.Include(r => r.Admin).Include(r => r.Users).Where(r => r.Admin != user && !r.Users.Contains(user)).ToList();
             List<Request> requests = db.Requests.Where(r => r.User == user).ToList();
-            // ViewBag.CurrentUser = user.Email;
             ViewBag.Requests = requests;
             return View(rooms);
         }
@@ -123,7 +122,6 @@ namespace Cua.Controllers
         {
             User user = await db.Users.FindAsync(userId);
             Room room = await db.Rooms.Include(r => r.Users).FirstOrDefaultAsync(r => r.Id == id);
-            // Console.WriteLine($"User id: {user.Id}; room id: {room.Id}");
 
             if (user != null && room != null)
             {
@@ -183,9 +181,11 @@ namespace Cua.Controllers
 
         public IActionResult Control(int id)
         {
+            User user = db.Users.FirstOrDefault(u => u.Email == HttpContext.User.Identity.Name);
             ControlPanelModel model = new ControlPanelModel();
             model.Room = db.Rooms.Include(r => r.Users).FirstOrDefault(r => r.Id == id);
             model.Requests = db.Requests.Include(r => r.User).Where(r => r.Room == model.Room && r.Checked == false).ToList();
+            model.Queues = db.Queues.Include(q => q.QueueUser).Where(q => q.Room == model.Room && q.Creator == user).ToList();
             return View(model);
         }
 

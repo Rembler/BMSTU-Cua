@@ -50,6 +50,20 @@
                     </div>
                 </div>
             </div>
+            <br/>
+            <div class="separate-div separate-div-no-col">
+                <div class="content-div my-content-label-div"><p>My queues</p></div>
+            </div>
+            <div class="separate-div separate-div-no-col">
+                @foreach (var item in Model.Queues)
+                {
+                    <div class="content-div my-participant-div">
+                        <p>Queue "@item.Name" (Participants: @item.QueueUser.Count())</p>
+                        <p class="queue-id" hidden>@item.Id</p>
+                        <a class="delete-queue" href="#" onclick="return false;"><ion-icon name="close-outline"></ion-icon></a>
+                    </div> 
+                }
+            </div>
         </div>
         <div class="col">
             <div class="separate-div separate-div-no-col">

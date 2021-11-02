@@ -7,5 +7,6 @@ namespace Cua.ViewModels
     {
         public Room Room { get; set; }
         public List<Request> Requests { get; set; }
+        public List<Queue> Queues { get; set; }
     }
 }

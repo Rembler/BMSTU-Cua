@@ -1,5 +1,21 @@
 @model Cua.ViewModels.RegisterModel
 
+<div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <p id="got-id" hidden></p>
+        <div class="modal-content separate-div modal-div">
+            <div class="modal-header">
+                <div class="content-div content-modal-header">
+                    <h5 class="modal-title" id="deleteUserModalTitle">Delete account?</h5>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a asp-action="Delete" asp-controller="Account"><button type="button" class="btn btn-primary my-qs-btn">Yes</button></a>
+                <button type="button" class="btn btn-secondary yn-btn" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="container separate-div my-account-info-div">
     <div class="row">
@@ -42,6 +58,12 @@
         </div>
         <div class="col">
             <button id="update-password" type="button" class="btn btn-primary my-qs-btn">Update password</button>
+        </div>
+    </div>
+    <br/>
+    <div class="row justify-content-end">
+        <div class="col-4">
+            <button type="button" class="btn btn-danger my-qs-btn" data-toggle="modal" data-target="#deleteUserModal">Delete account</button>
         </div>
     </div>
 </div>

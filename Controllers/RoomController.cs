@@ -44,6 +44,19 @@ namespace Cua.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> Delete(int id) 
+        {
+            Room removedRoom = await db.Rooms.FindAsync(id);
+            if (removedRoom != null)
+            {
+                db.Rooms.Remove(removedRoom);
+                await db.SaveChangesAsync();
+                return RedirectToAction("Index", "Home");
+            }
+            Console.Write("Can't find room with ID = " + id);
+            return RedirectToAction("Control", "Room");
+        }
+
         public async Task<JsonResult> Update(int id, string newName, string newCompany, string newAbout)
         {
             Room room = await db.Rooms.FindAsync(id);

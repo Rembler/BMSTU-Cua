@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -177,6 +178,18 @@ namespace Cua.Controllers
                 return View(model);
             }
             return View(model);
+        }
+
+        public async Task<IActionResult> Delete()
+        {
+            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            List<Room> removedRooms = db.Rooms.Where(r => r.Admin == user).ToList();
+
+            db.Rooms.RemoveRange(removedRooms);
+            db.Users.Remove(user);
+            await db.SaveChangesAsync();
+
+            return RedirectToAction("Logout", "Account");
         }
 
         public async Task<IActionResult> Settings()

@@ -9,24 +9,27 @@ using Cua.Models;
 using Microsoft.AspNetCore.Authorization;
 using Cua.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Cua.Services;
 
 namespace Cua.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private ApplicationContext db;
         private readonly ILogger<HomeController> _logger;
+        private readonly AuthorizationService _authorizer;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationContext context)
+        public HomeController(ILogger<HomeController> logger, ApplicationContext context, AuthorizationService authorizationService)
         {
             _logger = logger;
             db = context;
+            _authorizer = authorizationService;
         }
 
-        [Authorize]
         public async Task<IActionResult> Index()
         {
-            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
             List<Room> roomsList = db.Rooms
                 .Include(r => r.Admin)
                 .Include(r => r.RoomUsers)
@@ -48,6 +51,11 @@ namespace Cua.Controllers
         public IActionResult Privacy()
         {
             return View();
+        }
+
+        public IActionResult Warning(string message)
+        {
+            return View((Object)message);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

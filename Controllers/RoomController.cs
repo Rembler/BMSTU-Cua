@@ -3,25 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cua.Models;
+using Cua.Services;
 using Cua.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cua.Controllers
 {
+    [Authorize]
     public class RoomController : Controller
     {
         private ApplicationContext db;
+        private readonly AuthorizationService _authorizer;
         
-        public RoomController(ApplicationContext context)
+        public RoomController(ApplicationContext context, AuthorizationService authorizationService)
         {
             db = context;
+            _authorizer = authorizationService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
             CreateRoomModel model = new CreateRoomModel() { Company = user.Company, About = "Generic room description" };
             return View(model);
         }
@@ -46,7 +51,11 @@ namespace Cua.Controllers
 
         public async Task<IActionResult> Delete(int id) 
         {
+            if (!_authorizer.IsAdmin(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the admin of this room"});
+
             Room removedRoom = await db.Rooms.FindAsync(id);
+
             if (removedRoom != null)
             {
                 db.Rooms.Remove(removedRoom);
@@ -57,8 +66,11 @@ namespace Cua.Controllers
             return RedirectToAction("Control", "Room");
         }
 
-        public async Task<JsonResult> Update(int id, string newName, string newCompany, string newAbout)
+        public async Task<IActionResult> Update(int id, string newName, string newCompany, string newAbout)
         {
+            if (!_authorizer.IsModerator(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+
             Room room = await db.Rooms.FindAsync(id);
             if (room != null)
             {
@@ -76,7 +88,7 @@ namespace Cua.Controllers
 
         public async Task<IActionResult> Join()
         {
-            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
             List<Room> rooms = db.Rooms
                 .Include(r => r.Admin)
                 .Include(r => r.RoomUsers)
@@ -89,8 +101,11 @@ namespace Cua.Controllers
             return View(rooms);
         }
 
-        public async Task<JsonResult> Decline(int id, int userId)
+        public async Task<IActionResult> Decline(int id, int userId)
         {
+            if (!_authorizer.IsModerator(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+
             Request request = await db.Requests.FirstOrDefaultAsync(r => r.UserId == userId && r.RoomId == id);
             if (request != null)
             {
@@ -103,20 +118,42 @@ namespace Cua.Controllers
             return Json(null);
         }
 
-        public async Task<JsonResult> AddUser(int id, int? userId)
+        public async Task<IActionResult> AddUser(int id, int? userId)
         {
             var room = await db.Rooms.FindAsync(id);
             User user;
 
             if (userId != null)
             {
+                if (!_authorizer.IsModerator(HttpContext, id))
+                    return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+
                 user = await db.Users.FindAsync(userId);
-                Request request = await db.Requests.FirstOrDefaultAsync(r => r.User == user && r.Room == room);
-                request.Checked = true;
-                db.Requests.Update(request);
+                if (user != null)
+                {
+                    Request request = await db.Requests.FirstOrDefaultAsync(r => r.User == user && r.Room == room);
+                    if (request != null)
+                    {
+                        request.Checked = true;
+                        db.Requests.Update(request);
+                    }
+                    else
+                    {
+                        Console.Write("This user didn't send a join request");
+                        return Json(null);
+                    }
+                }
+                else
+                {
+                    Console.Write("No such user");
+                    return Json(null);
+                }
             }
             else
             {
+                if (room.Private)
+                    return RedirectToAction("Warning", "Home", new { message = "You can't join private room without request"});
+
                 user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
             }
 
@@ -142,8 +179,11 @@ namespace Cua.Controllers
             return Json(null);
         }
 
-        public async Task<JsonResult> ChangeModeratorStatus(int id, int userId)
+        public async Task<IActionResult> ChangeModeratorStatus(int id, int userId)
         {
+            if (!_authorizer.IsAdmin(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the admin of this room"});
+
             User user = await db.Users.FindAsync(userId);
             Room room = await db.Rooms.Include(r => r.Admin).FirstOrDefaultAsync(r => r.Id == id);
 
@@ -174,8 +214,11 @@ namespace Cua.Controllers
             return Json(null);
         }
 
-        public async Task<JsonResult> DeleteUser(int id, int userId)
+        public async Task<IActionResult> DeleteUser(int id, int userId)
         {
+            if (!_authorizer.IsAdmin(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the admin of this room"});
+
             User user = await db.Users.FindAsync(userId);
             Room room = await db.Rooms.FindAsync(id);
 
@@ -197,7 +240,7 @@ namespace Cua.Controllers
 
         public async Task<JsonResult> AddRequest(int id, string comment)
         {
-            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
             var room = await db.Rooms.FindAsync(id);
             if (user != null && room != null)
             {
@@ -223,6 +266,9 @@ namespace Cua.Controllers
         // [Route("/Room/{id}")]
         public IActionResult Content(int id)
         {
+            if (!_authorizer.IsMember(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+
             Room room = db.Rooms
                 .Include(r => r.RoomUsers)
                     .ThenInclude(ru => ru.User)
@@ -238,6 +284,9 @@ namespace Cua.Controllers
 
         public IActionResult Control(int id)
         {
+            if (!_authorizer.IsModerator(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+            
             User user = db.Users.FirstOrDefault(u => u.Email == HttpContext.User.Identity.Name);
             ControlPanelModel model = new ControlPanelModel();
             model.CurrentUser = user;
@@ -259,7 +308,10 @@ namespace Cua.Controllers
 
         public async Task<IActionResult> Queues(int id)
         {
-            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            if (!_authorizer.IsMember(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+
+            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
             ViewBag.CurrentUser = user;
             List<Queue> queues = await db.Queues
                 .Include(q => q.Creator)

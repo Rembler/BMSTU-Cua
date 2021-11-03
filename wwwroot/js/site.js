@@ -98,8 +98,10 @@ $(".declineRequest").click(function() {
 $("#addQueue").click(function() {
 
     var queueId = $("#got-id").text();
+    var url = window.location.href;
+    var roomId = url.substring(url.lastIndexOf('/') + 1);
 
-    $.post("/Queue/Join", { id: queueId})
+    $.post("/Queue/Join", { id: queueId, roomId: roomId })
         .done(function(data) {
 
             if (data == null) {
@@ -309,8 +311,10 @@ $(".show-participants-btn").click(function() {
 
     var room = $(this).closest(".room-for-join-div");
     var queueId = room.find(".hidden-p").text();
+    var url = window.location.href;
+    var roomId = url.substring(url.lastIndexOf('/') + 1);
 
-    $.post("/Queue/GetUsers", { id: queueId })
+    $.post("/Queue/GetUsers", { id: queueId, roomId: roomId })
         .done(function(data) {
 
             var list = $("#participants-list");
@@ -353,6 +357,7 @@ $(".change-active-status").click(function() {
         })
 });
 
+//  кнопка скрывающая параграфы с информацией о комнате и показывающая инпуты
 $(".change-description").click(function() {
 
     $(".my-info-div").hide();
@@ -361,6 +366,8 @@ $(".change-description").click(function() {
     $(".save-changes").show();
 });
 
+//  кнопка сохраняющая сделанные изменения в информции о комнате - отправляет пост
+//  запрос на сервер который меняет соответствующие поля
 $(".save-changes").click(function() {
 
     var newName = $("#room-name-input").val();
@@ -393,6 +400,8 @@ $(".save-changes").click(function() {
         })
 });
 
+//  крест напротив имени пользователя - отправляет пост запрос на сервер который
+//  удаляет связь между данными комнатой и пользователем
 $(".delete-user").click(function() {
 
     var clickedUser = $(this).closest(".my-participant-div");
@@ -413,6 +422,8 @@ $(".delete-user").click(function() {
         })
 });
 
+//  крест напротив названия очереди - отправляет пост запрос на сервер который
+//  удаляет запись с данной очередью
 $(".delete-queue").click(function() {
 
     var clickedQueue = $(this).closest(".my-participant-div");
@@ -431,12 +442,16 @@ $(".delete-queue").click(function() {
         })
 });
 
+//  значок шестеренки напротив названия очереди - открывает модальное окно и отправляет
+//  пост запрос на сервер который возвращает список участников этой очереди
 $(".queue-control").click(function() {
 
     var queueId = $(this).closest(".my-participant-div").find(".queue-id").text();
     $("#queue-id").text(queueId);
+    var url = window.location.href;
+    var roomId = url.substring(url.lastIndexOf('/') + 1);
 
-    $.post("/Queue/GetUsers", { id: queueId })
+    $.post("/Queue/GetUsers", { id: queueId, roomId: roomId })
         .done(function(data) {
 
             if (data == null) {
@@ -470,6 +485,9 @@ $(".queue-control").click(function() {
         })
 });
 
+//  кнопка на модальном окне управления очередью - отправляет пост запрос на сервер который
+//  удаляет связь между данными очередью и пользователем и меняет значение позиции на -1 у 
+//  всех оставшихся участников очереди
 $("#remove-first-user").click(function() {
 
     var toRemove = $("#my-queue-members").children(".my-queue-member-holder").eq(0);
@@ -502,6 +520,9 @@ $("#remove-first-user").click(function() {
         })
 });
 
+//  кнопка на панеле настройки аккаунта - либо скрывает параграфы с основной информацией
+//  и делает инпуты видимыми либо отправляет пост запрос на сервер который обновляет
+//  данные поля в записи текущего пользователя
 $("#update-info").click(function() {
 
     if($(this).text() == "Update information")
@@ -538,6 +559,9 @@ $("#update-info").click(function() {
     }
 });
 
+//  кнопка на панеле настройки аккаунта - либо скрывает параграф с почтой и делает инпут
+//  видимым либо отправляет пост запрос на сервер который обновляет адрес электронной 
+//  почты у текущего пользователя и отправляет письмо с подтверждением
 $("#update-email").click(function() {
 
     if($(this).text() == "Update email") {
@@ -572,6 +596,9 @@ $("#update-email").click(function() {
     }
 });
 
+//  кнопка на панеле настройки аккаунта - либо делает видимыми инпуты для паролей
+//  либо отправляет пост запрос на сервер который обновляет пароль и соль
+//  текущего пользователя
 $("#update-password").click(function() {
 
     if ($(this).text() == "Update password") {
@@ -609,6 +636,9 @@ $("#update-password").click(function() {
     }
 });
 
+//  значок поднятого или опущенного большого пальца напротив имени пользователя -
+//  отправляет пост запрос на сервер который меняет статус модератора у данного
+//  пользователя на противоположный
 $(".change-moderator-status").click(function() {
 
     var clickedLink = $(this);

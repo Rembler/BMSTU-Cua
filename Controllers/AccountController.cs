@@ -12,13 +12,15 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Cua.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Cua.Controllers
 {
     public class AccountController : Controller
     {
         private ApplicationContext db;
-        private readonly IMailService _mailService;
+        private readonly MailService _mailService;
+        private readonly AuthorizationService _authorizer;
 
         public class HashSalt
         {
@@ -26,10 +28,11 @@ namespace Cua.Controllers
             public byte[] Salt { get; set; }
         }
 
-        public AccountController(ApplicationContext context, IMailService mailService)
+        public AccountController(ApplicationContext context, MailService mailService, AuthorizationService authorizationService)
         {
             db = context;
             _mailService = mailService;
+            _authorizer = authorizationService;
         }
 
         [HttpGet]
@@ -180,9 +183,10 @@ namespace Cua.Controllers
             return View(model);
         }
 
+        [Authorize]
         public async Task<IActionResult> Delete()
         {
-            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
             List<Room> removedRooms = db.Rooms.Where(r => r.Admin == user).ToList();
 
             db.Rooms.RemoveRange(removedRooms);
@@ -192,19 +196,23 @@ namespace Cua.Controllers
             return RedirectToAction("Logout", "Account");
         }
 
+        [Authorize]
         public async Task<IActionResult> Settings()
         {
-            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
+
             RegisterModel model = new RegisterModel() { 
                 Email = user.Email, Name = user.Name,
                 Surname = user.Surname, Company = user.Company,
                 Password = user.Password };
+            
             return View(model);
         }
 
+        [Authorize]
         public async Task<JsonResult> UpdateInfo(string name, string surname, string company)
         {
-            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
 
             user.Name = name;
             user.Surname = surname;
@@ -215,9 +223,10 @@ namespace Cua.Controllers
             return Json("OK");
         }
 
+        [Authorize]
         public async Task<JsonResult> UpdateEmail(string email)
         {
-            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
 
             if (user.Email == email)
             {
@@ -254,9 +263,10 @@ namespace Cua.Controllers
             }
         }
 
+        [Authorize]
         public async Task<JsonResult> UpdatePassword(string password)
         {
-            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
 
             var hashsalt = EncryptPassword(password);
             user.Password = hashsalt.Hash;
@@ -335,6 +345,7 @@ namespace Cua.Controllers
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
         }
  
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

@@ -38,7 +38,9 @@ namespace Cua
                 });
 
             services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
-            services.AddTransient<IMailService, Services.MailService>();
+            services.AddTransient<MailService>();
+
+            services.AddTransient<AuthorizationService>();
                 
             services.AddControllersWithViews();
         }

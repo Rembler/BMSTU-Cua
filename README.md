@@ -14,3 +14,4 @@ Cua is a web application that can be used for queue organization and online appo
 - Basic rooms and queues sorting
 - Ability to make your rooms private
 - Editing information about rooms and users
+- Assigning moderators inside rooms

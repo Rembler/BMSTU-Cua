@@ -7,7 +7,7 @@ using MailKit.Security;
 
 namespace Cua.Services
 {
-    public class MailService : IMailService
+    public class MailService
     {
         private readonly MailSettings _mailSettings;
 

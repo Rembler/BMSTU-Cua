@@ -3,24 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cua.Models;
+using Cua.Services;
 using Cua.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cua.Controllers
 {
+    [Authorize]
     public class QueueController : Controller
     {
         private ApplicationContext db;
+        private readonly AuthorizationService _authorizer;
         
-        public QueueController(ApplicationContext context)
+        public QueueController(ApplicationContext context, AuthorizationService authorizationService)
         {
             db = context;
+            _authorizer = authorizationService;
         }
 
         [HttpGet]
         public IActionResult Create(int roomId)
         {
+            if (!_authorizer.IsModerator(HttpContext, roomId))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+
             CreateQueueModel model = new CreateQueueModel() { RoomId = roomId };
             return View(model);
         }
@@ -29,6 +37,9 @@ namespace Cua.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateQueueModel model)
         {
+            if (!_authorizer.IsModerator(HttpContext, model.RoomId))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+
             if (ModelState.IsValid)
             {
                 User creator = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
@@ -48,8 +59,11 @@ namespace Cua.Controllers
             return View(model);
         }
 
-        public async Task<JsonResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            if (!_authorizer.IsCreator(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not creator of this queue"});
+
             Queue removedQueue = await db.Queues.FindAsync(id);
             if (removedQueue != null)
             {
@@ -64,10 +78,12 @@ namespace Cua.Controllers
             return Json(null);
         }
 
-        public async Task<JsonResult> Join(int id)
+        public async Task<IActionResult> Join(int id, int roomId)
         {
-            User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
-            // Room room = await db.Rooms.FindAsync(roomId);
+            if (!_authorizer.IsMember(HttpContext, roomId))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+
+            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
             Queue queue = await db.Queues.FindAsync(id);
             List<QueueUser> alreadyIn = db.QueueUsers.Where(qu => qu.Queue == queue).ToList();
 
@@ -89,8 +105,11 @@ namespace Cua.Controllers
             return Json(null);
         }
 
-        public JsonResult ChangeActiveStatus(int id)
+        public IActionResult ChangeActiveStatus(int id)
         {
+            if (!_authorizer.IsCreator(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not creator of this queue"});
+
             Queue queue = db.Queues.Find(id);
 
             if (queue != null)
@@ -107,8 +126,11 @@ namespace Cua.Controllers
             }
         }
 
-        public async Task<JsonResult> GetUsers(int id)
+        public async Task<IActionResult> GetUsers(int id, int roomId)
         {
+            if (!_authorizer.IsMember(HttpContext, roomId))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+
             Queue queue = await db.Queues
                 .Include(q => q.QueueUsers)
                 .ThenInclude(qu => qu.User)
@@ -136,7 +158,7 @@ namespace Cua.Controllers
             return Json(null);
         }
 
-        public async Task<JsonResult> RemoveUser(int id, int? userId)
+        public async Task<IActionResult> RemoveUser(int id, int? userId)
         {
             List<QueueUser> queueUsers = await db.QueueUsers.Where(qu => qu.QueueId == id).ToListAsync();
 
@@ -144,10 +166,15 @@ namespace Cua.Controllers
             {
                 QueueUser removedUser;
                 if (userId != null)
+                {
+                    if (!_authorizer.IsCreator(HttpContext, id))
+                        return RedirectToAction("Warning", "Home", new { message = "You are not creator of this queue"});
+
                     removedUser = queueUsers.FirstOrDefault(qu => qu.UserId == userId);
+                }
                 else
                 {
-                    User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+                    User user = await _authorizer.GetCurrentUserAsync(HttpContext);
                     removedUser = queueUsers.FirstOrDefault(qu => qu.UserId == user.Id);
                 }
 

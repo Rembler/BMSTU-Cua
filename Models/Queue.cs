@@ -14,10 +14,10 @@ namespace Cua.Models
         public User Creator { get; set; }
         public int RoomId { get; set; }
         public Room Room { get; set; }
-        public ICollection<QueueUser> QueueUser { get; set; }
+        public ICollection<QueueUser> QueueUsers { get; set; }
         public Queue()
         {
-            QueueUser = new List<QueueUser>();
+            QueueUsers = new List<QueueUser>();
         }
     }
 }

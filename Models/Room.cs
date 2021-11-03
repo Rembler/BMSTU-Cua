@@ -13,11 +13,11 @@ namespace Cua.Models
         public int AdminId { get; set; }
         public User Admin { get; set; }
         public ICollection<Queue> Queues { get; set; }
-        public ICollection<User> Users { get; set; }
+        public ICollection<RoomUser> RoomUsers { get; set; }
         public ICollection<Request> Requests { get; set; }
         public Room()
         {
-            Users = new List<User>();
+            RoomUsers = new List<RoomUser>();
             Queues = new List<Queue>();
             Requests = new List<Request>();
         }

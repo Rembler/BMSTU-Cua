@@ -29,17 +29,17 @@ namespace Cua.Controllers
             User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
             List<Room> roomsList = db.Rooms
                 .Include(r => r.Admin)
-                .Include(r => r.Users)
+                .Include(r => r.RoomUsers)
                 .Include(r => r.Queues)
                 .AsSplitQuery()
                 .Where(r => r.Admin == user)
                 .ToList();
             roomsList = roomsList.Concat(db.Rooms
                 .Include(r => r.Admin)
-                .Include(r => r.Users)
+                .Include(r => r.RoomUsers)
                 .Include(r => r.Queues)
                 .AsSplitQuery()
-                .Where(r => r.Users.Contains(user))
+                .Where(r => r.RoomUsers.Any(ru => ru.UserId == user.Id))
                 .ToList()).ToList();
             ViewBag.CurrentUser = user.Email;
             return View(roomsList);

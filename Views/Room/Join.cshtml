@@ -74,17 +74,37 @@
                             <p class="admin-name">Admin: @item.Admin.Name @item.Admin.Surname</p><br/>
                         </div>
                     </div>
-                    <div class="row">
+                    @{ int index = 0; }
+                    @foreach (var queue in item.Queues)
+                    {
+                        if (index % 2 == 0)
+                        {
+                            @Html.Raw("<div class=\"row\">");
+                        }
+                        <div class="col content-div my-joinable-room-activity">
+                            <p>Queue "@queue.Name"</p>
+                        </div>
+                        if (index % 2 != 0)
+                        {
+                            @Html.Raw("</div>");
+                        }
+                        index++;
+                    }
+                    @if (index % 2 != 0)
+                    {
+                        @Html.Raw("</div>");
+                    }
+                    @* <div class="row">
                         <div class="col content-div"><p>Что-то</p></div>
                         <div class="col content-div"><p>Кто-то</p></div>
                     </div>
                     <div class="row">
                         <div class="col content-div"><p>Что-то</p></div>
                         <div class="col content-div"><p>Кто-то</p></div>
-                    </div>
+                    </div> *@
                     <div class="row">
                         <div class="col content-div company-name"><p>Organization: @item.Company</p></div>
-                        <div class="col content-div"><p>Number of participants: @item.Users.Count()</p></div>
+                        <div class="col content-div"><p>Number of participants: @item.RoomUsers.Count()</p></div>
                         @if (item.Private)
                         {
                             if (requests.Any(r => r.Room == item && r.Checked == false))

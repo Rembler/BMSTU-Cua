@@ -51,14 +51,26 @@ div.content-div a {
     font-size: 30px;
 }
 
-div.content-div a.delete-user, a.delete-queue {
+div.content-div a.delete-user, a.delete-queue, a.my-undo-moderator {
     color: red;
 }
 
-div.content-div a.queue-control {
+div.content-div a.queue-control, a.my-make-moderator {
     color: #007bff;
+}
+
+a.my-make-moderator, a.my-undo-moderator {
+    font-size: 25px !important;
+}
+
+a.my-undo-moderator {
+    padding-top: 3px;
 }
 
 .btn-danger {
     font-size: 18px;
+}
+
+.my-joinable-room-activity {
+    max-width: 478px;
 }

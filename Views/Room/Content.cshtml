@@ -27,9 +27,16 @@
             </div>
             <div class="separate-div separate-div-no-col">
                 <div class="content-div my-participant-div"><p>@Model.Admin.Name @Model.Admin.Surname (A)</p></div>
-                @foreach (var item in Model.Users)
+                @foreach (var item in Model.RoomUsers)
                 {
-                    <div class="content-div my-participant-div"><p>@item.Name @item.Surname</p></div>
+                    if (item.IsModerator)
+                    {
+                        <div class="content-div my-participant-div"><p>@item.User.Name @item.User.Surname (M)</p></div>
+                    }
+                    else
+                    {
+                        <div class="content-div my-participant-div"><p>@item.User.Name @item.User.Surname</p></div>
+                    }
                 }
             </div>
         </div>
@@ -48,7 +55,7 @@
                     <div class="col-6 my-show-queues-btn-holder">
                         <a asp-action="Queues" asp-controller="Room" asp-route-id=@Model.Id><button type="button" class="btn btn-primary my-qs-btn">View all queues</button></a>
                     </div>
-                    @if (ViewBag.CurrentUser == Model.Admin)
+                    @if (ViewBag.CurrentUser == Model.Admin || Model.RoomUsers.Where(ru => ru.IsModerator).Any(ru => ru.User == ViewBag.CurrentUser))
                     {
                         <div class="col-6 my-show-queues-btn-holder">
                             <a asp-action="Control" asp-controller="Room" asp-route-id=@Model.Id><button type="button" class="btn btn-primary my-qs-btn">Control panel</button></a>
@@ -68,11 +75,14 @@
                     {
                         <div class="content-div my-participant-div">
                             <p>@item.Name</p>
-                            <p id="user-count-@item.Id" class="my-user-count">(@item.QueueUser.Count())</p>
-                            <p class="queue-id" hidden>@item.Id</p>
-                            <a class="queue-control" href="#" onclick="return false;" data-toggle="modal" data-target="#queueControlModal">
-                                <ion-icon name="settings-outline"></ion-icon>
-                            </a>
+                            <p id="user-count-@item.Id" class="my-user-count">(@item.QueueUsers.Count())</p>
+                            @if (item.Creator == ViewBag.CurrentUser)
+                            {
+                                <p class="queue-id" hidden>@item.Id</p>
+                                <a class="queue-control" href="#" onclick="return false;" data-toggle="modal" data-target="#queueControlModal">
+                                    <ion-icon name="settings-outline"></ion-icon>
+                                </a>
+                            }
                         </div>
                     }
                 }

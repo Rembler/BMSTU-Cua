@@ -77,7 +77,13 @@ namespace Cua.Controllers
         public async Task<IActionResult> Join()
         {
             User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
-            List<Room> rooms = db.Rooms.Include(r => r.Admin).Include(r => r.Users).Where(r => r.Admin != user && !r.Users.Contains(user)).ToList();
+            List<Room> rooms = db.Rooms
+                .Include(r => r.Admin)
+                .Include(r => r.RoomUsers)
+                .Include(r => r.Queues)
+                .AsSplitQuery()
+                .Where(r => r.Admin != user && !r.RoomUsers.Any(ru => ru.UserId == user.Id))
+                .ToList();
             List<Request> requests = db.Requests.Where(r => r.User == user).ToList();
             ViewBag.Requests = requests;
             return View(rooms);
@@ -117,10 +123,15 @@ namespace Cua.Controllers
             if (user != null && room != null)
             {
                 // var roomUsers = db.Users.Where(u => u.Rooms.Any(r => r.Id == id)).ToList();
-                if (!room.Users.Contains(user))
+                // if (!room.Users.Contains(user))
+                if (!db.RoomUsers.Any(ru => ru.Room == room && ru.User == user))
                 {
-                    room.Users.Add(user);
-                    db.Rooms.Update(room);
+                    RoomUser newRoomUser = new RoomUser() { 
+                        Room = room, 
+                        User = user, 
+                        IsModerator = false
+                    };
+                    db.RoomUsers.Add(newRoomUser);
                     await db.SaveChangesAsync();
                     return Json("OK");
                 }
@@ -131,17 +142,49 @@ namespace Cua.Controllers
             return Json(null);
         }
 
-        public async Task<JsonResult> DeleteUser(int id, int userId)
+        public async Task<JsonResult> ChangeModeratorStatus(int id, int userId)
         {
             User user = await db.Users.FindAsync(userId);
-            Room room = await db.Rooms.Include(r => r.Users).FirstOrDefaultAsync(r => r.Id == id);
+            Room room = await db.Rooms.Include(r => r.Admin).FirstOrDefaultAsync(r => r.Id == id);
 
             if (user != null && room != null)
             {
-                if (room.Users.Contains(user))
+                RoomUser roomUser = await db.RoomUsers.FirstOrDefaultAsync(ru => ru.User == user && ru.Room == room);
+                if (roomUser != null)
                 {
-                    room.Users.Remove(user);
-                    db.Rooms.Update(room);
+                    roomUser.IsModerator = !roomUser.IsModerator;
+                    if (!roomUser.IsModerator)
+                    {
+                        List<Queue> changedQueues = await db.Queues
+                            .Include(q => q.Creator)
+                            .Where(q => q.Creator == user)
+                            .ToListAsync();
+                        foreach (var item in changedQueues)
+                            item.Creator = room.Admin;
+                        db.Queues.UpdateRange(changedQueues);
+                    }
+                    db.RoomUsers.Update(roomUser);
+                    await db.SaveChangesAsync();
+                    return Json("OK");
+                }
+                Console.Write("User isn't a member of the room");
+                return Json(null);
+            }
+            Console.Write($"User with ID = {user.Id} or room with ID = {room.Id} doesn't exist");
+            return Json(null);
+        }
+
+        public async Task<JsonResult> DeleteUser(int id, int userId)
+        {
+            User user = await db.Users.FindAsync(userId);
+            Room room = await db.Rooms.FindAsync(id);
+
+            if (user != null && room != null)
+            {
+                RoomUser removedRoomUser = await db.RoomUsers.FirstOrDefaultAsync(ru => ru.User == user && ru.Room == room);
+                if (removedRoomUser != null)
+                {
+                    db.RoomUsers.Remove(removedRoomUser);
                     await db.SaveChangesAsync();
                     return Json("OK");
                 }
@@ -181,10 +224,11 @@ namespace Cua.Controllers
         public IActionResult Content(int id)
         {
             Room room = db.Rooms
-                .Include(r => r.Users)
+                .Include(r => r.RoomUsers)
+                    .ThenInclude(ru => ru.User)
                 .Include(r => r.Admin)
                 .Include(r => r.Queues)
-                .ThenInclude(q => q.QueueUser)
+                    .ThenInclude(q => q.QueueUsers)
                 .AsSplitQuery()
                 .OrderBy(r => r.Id)
                 .FirstOrDefault(r => r.Id == id);
@@ -196,9 +240,20 @@ namespace Cua.Controllers
         {
             User user = db.Users.FirstOrDefault(u => u.Email == HttpContext.User.Identity.Name);
             ControlPanelModel model = new ControlPanelModel();
-            model.Room = db.Rooms.Include(r => r.Users).FirstOrDefault(r => r.Id == id);
-            model.Requests = db.Requests.Include(r => r.User).Where(r => r.Room == model.Room && r.Checked == false).ToList();
-            model.Queues = db.Queues.Include(q => q.QueueUser).Where(q => q.Room == model.Room && q.Creator == user).ToList();
+            model.CurrentUser = user;
+            model.Room = db.Rooms
+                .Include(r => r.Admin)
+                .Include(r => r.RoomUsers)
+                    .ThenInclude(ru => ru.User)
+                .FirstOrDefault(r => r.Id == id);
+            model.Requests = db.Requests
+                .Include(r => r.User)
+                .Where(r => r.Room == model.Room && r.Checked == false)
+                .ToList();
+            model.Queues = db.Queues
+                .Include(q => q.QueueUsers)
+                .Where(q => q.Room == model.Room && q.Creator == user)
+                .ToList();
             return View(model);
         }
 
@@ -208,7 +263,7 @@ namespace Cua.Controllers
             ViewBag.CurrentUser = user;
             List<Queue> queues = await db.Queues
                 .Include(q => q.Creator)
-                .Include(q => q.QueueUser)
+                .Include(q => q.QueueUsers)
                 .ThenInclude(qu => qu.User)
                 .Where(q => q.RoomId == id)
                 .ToListAsync();

@@ -608,3 +608,25 @@ $("#update-password").click(function() {
         }
     }
 });
+
+$(".change-moderator-status").click(function() {
+
+    var clickedLink = $(this);
+    var newLink = $(this).closest(".my-participant-div").find(".my-hidden-a");
+    var userId = $(this).closest(".my-participant-div").find(".user-id").text();
+    var url = window.location.href;
+    var roomId = url.substring(url.lastIndexOf('/') + 1);
+
+    $.post("/Room/ChangeModeratorStatus", { id: roomId, userId: userId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+
+                clickedLink.addClass("my-hidden-a").hide();
+                newLink.removeClass("my-hidden-a").show();
+            }
+        })
+});

@@ -14,16 +14,16 @@ namespace Cua.Models
         public string ConfirmationToken { get; set; }
         public bool IsConfirmed { get; set; }
         public ICollection<Room> AdminRooms { get; set; }
-        public ICollection<Room> Rooms { get; set; }
+        public ICollection<RoomUser> RoomUsers { get; set; }
         public ICollection<Queue> CreatedQueues { get; set; }
-        public ICollection<QueueUser> QueueUser { get; set; }
+        public ICollection<QueueUser> QueueUsers { get; set; }
         public ICollection<Request> Requests { get; set; }
         public User()
         {
             CreatedQueues = new List<Queue>();
-            Rooms = new List<Room>();
+            RoomUsers = new List<RoomUser>();
             AdminRooms = new List<Room>();
-            QueueUser = new List<QueueUser>();
+            QueueUsers = new List<QueueUser>();
             Requests = new List<Request>();
         }
     }

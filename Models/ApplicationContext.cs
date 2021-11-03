@@ -7,7 +7,8 @@ namespace Cua.Models
         public DbSet<User> Users { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Queue> Queues { get; set; }
-        public DbSet<QueueUser> QueueUser { get; set; }
+        public DbSet<QueueUser> QueueUsers { get; set; }
+        public DbSet<RoomUser> RoomUsers { get; set; }
         public DbSet<Request> Requests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -26,6 +27,9 @@ namespace Cua.Models
 
             modelBuilder.Entity<QueueUser>()
                 .HasKey(qu => new { qu.QueueId, qu.UserId });
+
+            modelBuilder.Entity<RoomUser>()
+                .HasKey(ru => new { ru.RoomId, ru.UserId });
 
             modelBuilder.Entity<Request>()
                 .HasKey(r => new { r.RoomId, r.UserId });

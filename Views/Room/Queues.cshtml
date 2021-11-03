@@ -69,12 +69,12 @@
                         </div>
                         <div class="row">
                             <div class="col content-div"><p>Start: @item.StartAt.ToString("dd.MM.yyyy") at @item.StartAt.ToString("HH:mm")</p></div>
-                            <div class="col content-div company-name"><p>Number of participants: </p><p class="num-of-participants">@item.QueueUser.Count()</p></div>
+                            <div class="col content-div company-name"><p>Number of participants: </p><p class="num-of-participants">@item.QueueUsers.Count()</p></div>
                             <div class="col join-btn-holder">
                                 <button class="btn btn-primary join-room-btn show-participants-btn"> Show all participants</button>
                             </div>
                             <div class="col join-btn-holder">
-                                @if (item.QueueUser.Any(qu => qu.User == ViewBag.CurrentUser))
+                                @if (item.QueueUsers.Any(qu => qu.User == ViewBag.CurrentUser))
                                 {
                                     <button class="btn btn-danger join-room-btn leave-queue-btn">Leave</button>
                                     <button class="btn btn-primary join-room-btn join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter" style="display: none;">Join</button>

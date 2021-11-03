@@ -24,12 +24,33 @@
                 <div class="content-div my-content-label-div"><p>Participants:</p></div>
             </div>
             <div class="separate-div separate-div-no-col">
-                @foreach (var item in Model.Room.Users)
+                @foreach (var item in Model.Room.RoomUsers)
                 {
                     <div class="content-div my-participant-div">
-                        <p>@item.Name @item.Surname</p>
-                        <p class="user-id" hidden>@item.Id</p>
-                        <a class="delete-user" href="#" onclick="return false;"><ion-icon name="close-outline"></ion-icon></a>
+                        <p>@item.User.Name @item.User.Surname</p>
+                        @if (Model.Room.Admin == Model.CurrentUser)
+                        {
+                            <p class="user-id" hidden>@item.User.Id</p>
+                            @if (item.IsModerator)
+                            {
+                                <a class="my-undo-moderator change-moderator-status" href="#" onclick="return false;">
+                                    <ion-icon name="thumbs-down-outline"></ion-icon>
+                                </a>
+                                <a class="my-make-moderator change-moderator-status my-hidden-a" href="#" onclick="return false;" style="display: none;">
+                                    <ion-icon name="thumbs-up-outline"></ion-icon>
+                                </a>
+                            }
+                            else
+                            {
+                                <a class="my-make-moderator change-moderator-status" href="#" onclick="return false;">
+                                    <ion-icon name="thumbs-up-outline"></ion-icon>
+                                </a>
+                                <a class="my-undo-moderator change-moderator-status my-hidden-a" href="#" onclick="return false;" style="display: none;">
+                                    <ion-icon name="thumbs-down-outline"></ion-icon>
+                                </a>
+                            }
+                            <a class="delete-user" href="#" onclick="return false;"><ion-icon name="close-outline"></ion-icon></a>
+                        }
                     </div> 
                 }
             </div>
@@ -66,12 +87,15 @@
                         <a asp-action="Content" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Back to room</button></a>
                     </div>
                 </div>
-                <br/>
-                <div class="row justify-content-end">
-                    <div class="col-4 my-show-queues-btn-holder">
-                        <button type="button" class="btn btn-danger my-qs-btn" data-toggle="modal" data-target="#deleteRoomModal">Delete room</button>
+                @if (Model.Room.Admin == Model.CurrentUser)
+                {
+                    <br/>
+                    <div class="row justify-content-end">
+                        <div class="col-4 my-show-queues-btn-holder">
+                            <button type="button" class="btn btn-danger my-qs-btn" data-toggle="modal" data-target="#deleteRoomModal">Delete room</button>
+                        </div>
                     </div>
-                </div>
+                }
             </div>
             <br/>
             <div class="separate-div separate-div-no-col">
@@ -81,7 +105,7 @@
                 @foreach (var item in Model.Queues)
                 {
                     <div class="content-div my-participant-div">
-                        <p>Queue "@item.Name" (Participants: @item.QueueUser.Count())</p>
+                        <p>Queue "@item.Name" (Participants: @item.QueueUsers.Count())</p>
                         <p class="queue-id" hidden>@item.Id</p>
                         <a class="delete-queue" href="#" onclick="return false;"><ion-icon name="close-outline"></ion-icon></a>
                     </div> 

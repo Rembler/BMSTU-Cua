@@ -53,8 +53,8 @@ namespace Cua.Controllers
             Queue removedQueue = await db.Queues.FindAsync(id);
             if (removedQueue != null)
             {
-                List<QueueUser> removedQueueUsers = await db.QueueUser.Where(qu => qu.QueueId == id).ToListAsync();
-                db.QueueUser.RemoveRange(removedQueueUsers);
+                List<QueueUser> removedQueueUsers = await db.QueueUsers.Where(qu => qu.QueueId == id).ToListAsync();
+                db.QueueUsers.RemoveRange(removedQueueUsers);
                 db.Queues.Remove(removedQueue);
                 await db.SaveChangesAsync();
                 
@@ -69,16 +69,16 @@ namespace Cua.Controllers
             User user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
             // Room room = await db.Rooms.FindAsync(roomId);
             Queue queue = await db.Queues.FindAsync(id);
-            List<QueueUser> alreadyIn = db.QueueUser.Where(qu => qu.Queue == queue).ToList();
+            List<QueueUser> alreadyIn = db.QueueUsers.Where(qu => qu.Queue == queue).ToList();
 
             int place = alreadyIn.Any() ? alreadyIn.Max(qu => qu.Place) + 1 : 1;
             if (user != null && queue != null)
             {
                 // var roomUsers = db.Users.Where(u => u.Rooms.Any(r => r.Id == id)).ToList();
-                if (!queue.QueueUser.Any(qu => qu.User == user))
+                if (!queue.QueueUsers.Any(qu => qu.User == user))
                 {
                     QueueUser queueUser = new QueueUser() { User = user, Queue = queue, Place = place };
-                    db.QueueUser.Update(queueUser);
+                    db.QueueUsers.Update(queueUser);
                     await db.SaveChangesAsync();
                     return Json("OK");
                 }
@@ -110,18 +110,18 @@ namespace Cua.Controllers
         public async Task<JsonResult> GetUsers(int id)
         {
             Queue queue = await db.Queues
-                .Include(q => q.QueueUser)
+                .Include(q => q.QueueUsers)
                 .ThenInclude(qu => qu.User)
                 .FirstOrDefaultAsync(q => q.Id == id);
             
             if (queue != null)
             {
-                if (queue.QueueUser.Count() == 0)
+                if (queue.QueueUsers.Count() == 0)
                     return Json(0);
                 else
                 {
                     List<QueueMemberModel> queueMembers = new List<QueueMemberModel>();
-                    foreach (var item in queue.QueueUser)
+                    foreach (var item in queue.QueueUsers)
                     {
                         queueMembers.Add(new QueueMemberModel { 
                             Name = item.User.Name + " " + item.User.Surname,
@@ -138,7 +138,7 @@ namespace Cua.Controllers
 
         public async Task<JsonResult> RemoveUser(int id, int? userId)
         {
-            List<QueueUser> queueUsers = await db.QueueUser.Where(qu => qu.QueueId == id).ToListAsync();
+            List<QueueUser> queueUsers = await db.QueueUsers.Where(qu => qu.QueueId == id).ToListAsync();
 
             if (queueUsers != null)
             {
@@ -153,12 +153,12 @@ namespace Cua.Controllers
 
                 if (removedUser != null)
                 {
-                    db.QueueUser.Remove(removedUser);
+                    db.QueueUsers.Remove(removedUser);
                     queueUsers.Remove(removedUser);
 
                     foreach (var item in queueUsers)
                         item.Place--;
-                    db.QueueUser.UpdateRange(queueUsers);
+                    db.QueueUsers.UpdateRange(queueUsers);
                     
                     await db.SaveChangesAsync();
                     return Json("OK");

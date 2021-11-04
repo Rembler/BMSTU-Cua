@@ -74,3 +74,35 @@ a.my-undo-moderator {
 .my-joinable-room-activity {
     max-width: 478px;
 }
+
+.chat-div {
+    height: 400px;
+    overflow-y: auto;
+}
+
+.chat-div::-webkit-scrollbar {
+    display: none;
+}
+
+#messagesList {
+    list-style: none;
+    padding: 0;
+}
+
+.content-div.my-msg-div {
+    padding: 5px 14px;
+}
+
+p.my-msg-sender {
+    display: table-row !important;
+    font-size: 14px;
+    color: #3683e9;
+}
+
+p.my-msg-body {
+    display: table-row !important;
+}
+
+.my-own-msg-div {
+    margin-left: auto;
+}

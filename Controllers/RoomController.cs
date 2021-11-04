@@ -269,17 +269,21 @@ namespace Cua.Controllers
             if (!_authorizer.IsMember(HttpContext, id))
                 return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
 
-            Room room = db.Rooms
-                .Include(r => r.RoomUsers)
-                    .ThenInclude(ru => ru.User)
-                .Include(r => r.Admin)
-                .Include(r => r.Queues)
-                    .ThenInclude(q => q.QueueUsers)
-                .AsSplitQuery()
-                .OrderBy(r => r.Id)
-                .FirstOrDefault(r => r.Id == id);
-            ViewBag.CurrentUser = db.Users.FirstOrDefault(u => u.Email == HttpContext.User.Identity.Name);
-            return View(room);
+            RoomContentModel model = new RoomContentModel() {
+                Room = db.Rooms
+                    .Include(r => r.RoomUsers)
+                        .ThenInclude(ru => ru.User)
+                    .Include(r => r.Admin)
+                    .Include(r => r.Queues)
+                        .ThenInclude(q => q.QueueUsers)
+                    .AsSplitQuery()
+                    .OrderBy(r => r.Id)
+                    .FirstOrDefault(r => r.Id == id),
+                CurrentUser = _authorizer.GetCurrentUser(HttpContext)
+            };
+            model.Messages = db.Messages.Where(m => m.Room == model.Room).ToList();
+            
+            return View(model);
         }
 
         public IActionResult Control(int id)

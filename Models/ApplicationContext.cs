@@ -10,6 +10,7 @@ namespace Cua.Models
         public DbSet<QueueUser> QueueUsers { get; set; }
         public DbSet<RoomUser> RoomUsers { get; set; }
         public DbSet<Request> Requests { get; set; }
+        public DbSet<Message> Messages { get; set ;}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

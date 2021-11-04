@@ -2,7 +2,7 @@
     ViewData["Title"] = "Room page";
 }
 
-@model Cua.Models.Room
+@model Cua.ViewModels.RoomContentModel
 
 <div class="modal fade" id="queueControlModal" tabindex="-1" role="dialog" aria-labelledby="queueControlModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -30,8 +30,8 @@
                 <div class="content-div my-content-label-div"><p>Participants:</p></div>
             </div>
             <div class="separate-div separate-div-no-col">
-                <div class="content-div my-participant-div"><p>@Model.Admin.Name @Model.Admin.Surname (A)</p></div>
-                @foreach (var item in Model.RoomUsers)
+                <div class="content-div my-participant-div"><p>@Model.Room.Admin.Name @Model.Room.Admin.Surname (A)</p></div>
+                @foreach (var item in Model.Room.RoomUsers)
                 {
                     if (item.IsModerator)
                     {
@@ -47,24 +47,56 @@
         <div class="col-5">
             <div class="separate-div">
                 <div class="row">
-                    <div class="col-7 content-div"><p>@Model.Name</p></div>
-                    <div class="col content-div"><p>@Model.Company</p></div>
+                    <div class="col-7 content-div"><p>@Model.Room.Name</p></div>
+                    <div class="col content-div"><p>@Model.Room.Company</p></div>
                 </div>
                 <div class="row">
-                    <div class="col content-div"><p>@Model.About</p></div>
+                    <div class="col content-div"><p>@Model.Room.About</p></div>
                 </div>
             </div>
             <div class="separate-div">
                 <div class="row">
                     <div class="col-6 my-show-queues-btn-holder">
-                        <a asp-action="Queues" asp-controller="Room" asp-route-id=@Model.Id><button type="button" class="btn btn-primary my-qs-btn">View all queues</button></a>
+                        <a asp-action="Queues" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">View all queues</button></a>
                     </div>
-                    @if (ViewBag.CurrentUser == Model.Admin || Model.RoomUsers.Where(ru => ru.IsModerator).Any(ru => ru.User == ViewBag.CurrentUser))
+                    @if (Model.CurrentUser == Model.Room.Admin || Model.Room.RoomUsers.Where(ru => ru.IsModerator).Any(ru => ru.User == Model.CurrentUser))
                     {
                         <div class="col-6 my-show-queues-btn-holder">
-                            <a asp-action="Control" asp-controller="Room" asp-route-id=@Model.Id><button type="button" class="btn btn-primary my-qs-btn">Control panel</button></a>
+                            <a asp-action="Control" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Control panel</button></a>
                         </div>
                     }
+                </div>
+            </div>
+            <br/>
+            <div class="separate-div chat-div">
+                <ul id="messagesList">
+                    @foreach (var item in Model.Messages)
+                    {
+                        <li>
+                            @if (item.Sender == Model.CurrentUser.Name + " " + Model.CurrentUser.Surname)
+                            {
+                                @Html.Raw("<div class=\"content-div my-msg-div my-own-msg-div\">");
+                            }
+                            else
+                            {
+                                @Html.Raw("<div class=\"content-div my-msg-div\">");
+                            }
+                            <p class="my-msg-sender">@item.Sender</p>
+                            <p class="my-msg-body">@item.Body</p>
+                            @Html.Raw("</div>");
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="separate-div">
+                <div class="row">
+                    <div class="col">
+                        <p id="current-user" hidden>@Model.CurrentUser.Name @Model.CurrentUser.Surname</p>
+                        <input id="message" type="text" class="my-input" placeholder="Message" />
+                    </div>
+                    <div class="col-3 my-show-queues-btn-holder">
+                        <button id="send-message" type="button" class="btn btn-primary my-qs-btn">Send</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -73,14 +105,14 @@
                 <div class="content-div my-content-label-div"><p>Active queues:</p></div>
             </div>
             <div class="separate-div separate-div-no-col">
-                @foreach (var item in Model.Queues)
+                @foreach (var item in Model.Room.Queues)
                 {
                     if (item.Active)
                     {
                         <div class="content-div my-participant-div">
                             <p>@item.Name</p>
                             <p id="user-count-@item.Id" class="my-user-count">(@item.QueueUsers.Count())</p>
-                            @if (item.Creator == ViewBag.CurrentUser)
+                            @if (item.Creator == Model.CurrentUser)
                             {
                                 <p class="queue-id" hidden>@item.Id</p>
                                 <a class="queue-control" href="#" onclick="return false;" data-toggle="modal" data-target="#queueControlModal">
@@ -94,3 +126,5 @@
         </div>
     </div>
 </div>
+<script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+<script src="~/js/chat.js"></script>

@@ -45,7 +45,7 @@
                 </div>
             </div>
         </div>
-        <div id="room-for-join-holder" class="flex-fill ml-5">
+        <div id="items-holder" class="flex-fill ml-5">
         @foreach (var item in Model)
         {
             <div class="separate-div room-for-join-div">
@@ -81,12 +81,12 @@
                                 @if (item.QueueUsers.Any(qu => qu.User == ViewBag.CurrentUser))
                                 {
                                     <button class="btn btn-danger join-room-btn leave-queue-btn">Leave</button>
-                                    <button class="btn btn-primary join-room-btn join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter" style="display: none;">Join</button>
+                                    <button class="btn btn-primary join-room-btn id-giver join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter" style="display: none;">Join</button>
                                 }
                                 else
                                 {
                                     <button class="btn btn-danger join-room-btn leave-queue-btn" style="display: none;">Leave</button>
-                                    <button class="btn btn-primary join-room-btn join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter">Join</button>
+                                    <button class="btn btn-primary join-room-btn id-giver join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter">Join</button>
                                 }
                             </div>
                         </div>

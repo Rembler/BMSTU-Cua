@@ -96,7 +96,7 @@ namespace Cua.Controllers
                 .AsSplitQuery()
                 .Where(r => r.Admin != user && !r.RoomUsers.Any(ru => ru.UserId == user.Id))
                 .ToList();
-            List<Request> requests = db.Requests.Where(r => r.User == user).ToList();
+            List<Request> requests = db.Requests.Where(r => r.User == user && !r.FromRoom).ToList();
             ViewBag.Requests = requests;
             return View(rooms);
         }
@@ -106,7 +106,11 @@ namespace Cua.Controllers
             if (!_authorizer.IsModerator(HttpContext, id))
                 return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
 
-            Request request = await db.Requests.FirstOrDefaultAsync(r => r.UserId == userId && r.RoomId == id);
+            Request request = await db.Requests.FirstOrDefaultAsync(r => r.UserId == userId
+                && r.RoomId == id
+                && !r.Checked
+                && !r.FromRoom);
+
             if (request != null)
             {
                 request.Checked = true;
@@ -129,15 +133,24 @@ namespace Cua.Controllers
                     return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
 
                 user = await db.Users.FindAsync(userId);
-                if (user != null)
+            }
+            else
+                user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+
+            if (user != null && room != null)
+            {
+                Request request = await db.Requests.FirstOrDefaultAsync(r => r.User == user
+                    && r.Room == room
+                    && !r.Checked);
+
+                if (userId != null)
                 {
-                    Request request = await db.Requests.FirstOrDefaultAsync(r => r.User == user && r.Room == room);
-                    if (request != null)
+                    if (request != null && request.FromRoom)
                     {
-                        request.Checked = true;
-                        db.Requests.Update(request);
+                        Console.Write("Room admin trying to accept request from room");
+                        return Json(null);
                     }
-                    else
+                    if (request == null)
                     {
                         Console.Write("This user didn't send a join request");
                         return Json(null);
@@ -145,22 +158,24 @@ namespace Cua.Controllers
                 }
                 else
                 {
-                    Console.Write("No such user");
-                    return Json(null);
+                    if (request != null && !request.FromRoom)
+                    {
+                        Console.Write("User trying to accept request from user");
+                        return Json(null);
+                    }
+                    if (request == null && room.Private)
+                    {
+                        Console.Write("User trying to enter private room without request");
+                        return Json(null);
+                    }
                 }
-            }
-            else
-            {
-                if (room.Private)
-                    return RedirectToAction("Warning", "Home", new { message = "You can't join private room without request"});
 
-                user = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
-            }
+                if (request != null)
+                {
+                    request.Checked = true;
+                    db.Requests.Update(request);
+                }
 
-            if (user != null && room != null)
-            {
-                // var roomUsers = db.Users.Where(u => u.Rooms.Any(r => r.Id == id)).ToList();
-                // if (!room.Users.Contains(user))
                 if (!db.RoomUsers.Any(ru => ru.Room == room && ru.User == user))
                 {
                     RoomUser newRoomUser = new RoomUser() { 
@@ -238,22 +253,42 @@ namespace Cua.Controllers
             return Json(null);
         }
 
-        public async Task<JsonResult> AddRequest(int id, string comment)
+        public async Task<IActionResult> AddRequest(int id, string comment, int? userId)
         {
-            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
+            User user;
+            bool fromRoom = false;
+            if (userId != null)
+            {
+                if (!_authorizer.IsModerator(HttpContext, id))
+                    return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+            
+                user = await db.Users.FindAsync(userId);
+                fromRoom = true;
+            }
+            else
+                user = await _authorizer.GetCurrentUserAsync(HttpContext);
+            
             var room = await db.Rooms.FindAsync(id);
             if (user != null && room != null)
             {
                 Request request = await db.Requests.FirstOrDefaultAsync(r => r.Room == room && r.User == user);
+
                 if (request != null)
                 {
                     request.Checked = false;
+                    request.FromRoom = fromRoom;
                     request.Comment = comment;
                     db.Requests.Update(request);
                 }
                 else
                 {
-                    Request newRequest = new Request { Room = room, User = user, Checked = false, Comment = comment };
+                    Request newRequest = new Request { 
+                        Room = room, 
+                        User = user, 
+                        Checked = false, 
+                        FromRoom = fromRoom, 
+                        Comment = comment 
+                    };
                     db.Requests.Add(newRequest);
                 }
                 await db.SaveChangesAsync();
@@ -301,13 +336,23 @@ namespace Cua.Controllers
                 .FirstOrDefault(r => r.Id == id);
             model.Requests = db.Requests
                 .Include(r => r.User)
-                .Where(r => r.Room == model.Room && r.Checked == false)
+                .Where(r => r.Room == model.Room 
+                    && r.Checked == false 
+                    && !r.FromRoom)
                 .ToList();
             model.Queues = db.Queues
                 .Include(q => q.QueueUsers)
                 .Where(q => q.Room == model.Room && q.Creator == user)
                 .ToList();
             return View(model);
+        }
+
+        public IActionResult Candidates(int id)
+        {
+            if (!_authorizer.IsModerator(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+            
+            return View();
         }
 
         public async Task<IActionResult> Queues(int id)
@@ -324,6 +369,49 @@ namespace Cua.Controllers
                 .Where(q => q.RoomId == id)
                 .ToListAsync();
             return View(queues);
+        }
+
+        public async Task<IActionResult> GetAvailableUsers(int id, string searchedName, string searchedCompany)
+        {
+            if (!_authorizer.IsModerator(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+
+            if (searchedCompany == null)
+                searchedCompany = "";
+            if (searchedName == null)
+                searchedName = "";
+
+            if (searchedName != "" || searchedCompany != "")
+            {
+                Room room = await db.Rooms.FindAsync(id);
+                if (room != null)
+                {
+                    List<User> availableUsers = await db.Users.Include(u => u.RoomUsers)
+                        .Where(u => !u.RoomUsers.Any(ru => ru.RoomId == id)
+                            && u.Id != room.AdminId
+                            && (u.Name.Contains(searchedName) || u.Surname.Contains(searchedName))
+                            && u.Company.Contains(searchedCompany))
+                        .ToListAsync();
+
+                    if (availableUsers != null)
+                    {
+                        List<AvailableUserModel> model = new List<AvailableUserModel>();
+                        foreach (var item in availableUsers)
+                        {
+                            model.Add(new AvailableUserModel {
+                                Name = item.Name + " " + item.Surname,
+                                UserId = item.Id,
+                                Company = item.Company
+                            });
+                        }
+                        return Json(model);
+                    }
+                    return Json(0);
+                }
+                Console.Write("Room with ID = " + id + " doesn't exist");
+                return Json(null);
+            }
+            return Json(0);
         }
     }
 }

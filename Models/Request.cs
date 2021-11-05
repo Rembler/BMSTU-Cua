@@ -10,6 +10,7 @@ namespace Cua.Models
         public Room Room { get; set; }
         public User User { get; set; }
         public bool Checked { get; set; }
+        public bool FromRoom { get; set; }
         public string Comment { get; set; }
     }
 }

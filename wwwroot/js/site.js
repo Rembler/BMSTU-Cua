@@ -5,12 +5,22 @@
 
 //  кнопка на странице доступных комнат - перекидывает айди комнаты из скрытого текста на карточке
 //  в скрытый текст на модальном окне
-$(".join-room-btn").click(function() {
+// $(".join-room-btn").click(function() {
 
-    var room = $(this).closest(".room-for-join-div");
-    var roomId = room.find(".hidden-p").text();
-    $("#got-id").text(roomId);
-    $("#got-id-for-request").text(roomId);
+//     var room = $(this).closest(".room-for-join-div");
+//     var roomId = room.find(".hidden-p").text();
+//     console.log(roomId);
+//     $("#got-id").text(roomId);
+//     $("#got-id-for-request").text(roomId);
+// });
+
+$("#items-holder").on("click", ".id-giver", function() {
+
+    var item = $(this).closest(".room-for-join-div");
+    var itemId = item.find(".hidden-p").text();
+    console.log(itemId);
+    $("#got-id").text(itemId);
+    $("#got-id-for-request").text(itemId);
 });
 
 //  кнопка добавить комнату - отправляет пост запрос на сервер который устанавливает связь между 
@@ -241,7 +251,7 @@ $(".search-input").keyup(function() {
 $("#room-cri").keyup(function() {
 
     var searchFor = $(this).val();
-    var $rooms = $("#room-for-join-holder"),
+    var $rooms = $("#items-holder"),
         $roomsList = $rooms.children();
     
     $roomsList.each(function() {
@@ -258,7 +268,7 @@ $("#room-cri").keyup(function() {
 $("#admin-cri").keyup(function() {
 
     var searchFor = $(this).val();
-    var $rooms = $("#room-for-join-holder"),
+    var $rooms = $("#items-holder"),
         $roomsList = $rooms.children();
     
     $roomsList.each(function() {
@@ -275,7 +285,7 @@ $("#admin-cri").keyup(function() {
 $("#company-cri").keyup(function() {
 
     var searchFor = $(this).val();
-    var $rooms = $("#room-for-join-holder"),
+    var $rooms = $("#items-holder"),
         $roomsList = $rooms.children();
     
     $roomsList.each(function() {
@@ -292,7 +302,7 @@ $("#company-cri").keyup(function() {
 $("#private-checkbox").click(function() {
 
     var status = $(this).is(":checked");
-    var $rooms = $("#room-for-join-holder"),
+    var $rooms = $("#items-holder"),
         $roomsList = $rooms.children();
 
     $roomsList.each(function() {
@@ -657,6 +667,78 @@ $(".change-moderator-status").click(function() {
 
                 clickedLink.addClass("my-hidden-a").hide();
                 newLink.removeClass("my-hidden-a").show();
+            }
+        })
+});
+
+$(".candidates-input").change(function() {
+
+    var searchedName = $("#user-name-cri").val();
+    var searchedCompany = $("#user-company-cri").val();
+    var url = window.location.href;
+    var roomId = url.substring(url.lastIndexOf('/') + 1);
+    var target = $("#items-holder").empty();
+    // target.empty();
+
+    $.post("/Room/GetAvailableUsers", { id: roomId, searchedName: searchedName, searchedCompany: searchedCompany })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: OK");
+
+                if (data != 0) {
+                    data.forEach(element => {
+                        var userDiv = $("<div></div>").addClass("separate-div room-for-join-div");
+                        var hiddenP = $("<p></p>").addClass("hidden-p")
+                            .attr("id", `queueId-${element.userId}`)
+                            .text(element.userId)
+                            .hide();
+                        var rowDiv = $("<div></div>").addClass("row");
+                        var nameDiv = $("<div></div>").addClass("col-6 content-div");
+                        var nameP = $("<p></p>").text(element.name);
+                        var companyDiv = $("<div></div>").addClass("col content-div");
+                        var companyP = $("<p></p>").text(element.company);
+                        var buttonDiv = $("<div></div>").addClass("col-2 join-btn-holder");
+                        var button = $("<button></button>").addClass("btn btn-primary join-room-btn id-giver")
+                            .attr("data-toggle", "modal")
+                            .attr("data-target", "#sendRequesConfirmationModal")
+                            .text("Invite");
+
+                        target.append(
+                            userDiv.append([
+                                hiddenP, 
+                                rowDiv.append([
+                                    nameDiv.append(nameP),
+                                    companyDiv.append(companyP),
+                                    buttonDiv.append(button)
+                                ])
+                            ])
+                        )
+                    })
+                }
+            }
+        })
+})
+
+$("#send-request-to-user").click(function() {
+
+    var userId = $("#got-id").text();
+    var comment = $("#comment-input").val();
+    var url = window.location.href;
+    var roomId = url.substring(url.lastIndexOf('/') + 1);
+
+    $.post("/Room/AddRequest", { id: roomId, comment: comment, userId: userId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+                $("#sendRequesConfirmationModal").modal("toggle");
+                var toDeactivate = $(`#queueId-${userId}`).closest(".room-for-join-div").find(".join-room-btn");
+                toDeactivate.prop("disabled", true);
             }
         })
 });

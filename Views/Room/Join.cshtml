@@ -52,7 +52,7 @@
             <input id="private-checkbox" type="checkbox"/><label>Only private rooms</label>
         </div>
     </div>
-    <div id="room-for-join-holder" class="flex-fill ml-5">
+    <div id="items-holder" class="flex-fill ml-5">
     @{ List<Request> requests = ViewBag.Requests; }
     @foreach (var item in Model)
     {
@@ -113,16 +113,16 @@
                         {
                             if (requests.Any(r => r.Room == item && r.Checked == false))
                             {
-                                <div class="col join-btn-holder"><button class="btn btn-primary join-room-btn" data-toggle="modal" data-target="#privateRoomJoinModal" disabled>Join</button></div>
+                                <div class="col join-btn-holder"><button class="btn btn-primary join-room-btn id-giver" data-toggle="modal" data-target="#privateRoomJoinModal" disabled>Join</button></div>
                             }
                             else
                             {
-                                <div class="col join-btn-holder"><button class="btn btn-primary join-room-btn" data-toggle="modal" data-target="#privateRoomJoinModal">Join</button></div>
+                                <div class="col join-btn-holder"><button class="btn btn-primary join-room-btn id-giver" data-toggle="modal" data-target="#privateRoomJoinModal">Join</button></div>
                             }
                         }
                         else
                         {
-                            <div class="col join-btn-holder"><button class="btn btn-primary join-room-btn" data-toggle="modal" data-target="#roomJoinModal">Join</button></div>
+                            <div class="col join-btn-holder"><button class="btn btn-primary join-room-btn id-giver" data-toggle="modal" data-target="#roomJoinModal">Join</button></div>
                         }
                     </div>
                 </div>

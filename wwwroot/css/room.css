@@ -69,6 +69,8 @@ a.my-undo-moderator {
 
 .btn-danger {
     font-size: 18px;
+    padding: 11px;
+    border: none;
 }
 
 .my-joinable-room-activity {

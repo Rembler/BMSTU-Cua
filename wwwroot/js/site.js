@@ -71,6 +71,7 @@ $(".acceptRequest").click(function() {
     var userId = currentDiv.find(".request-id").text();
     var url = window.location.href;
     var roomId = url.substring(url.lastIndexOf('/') + 1);
+
     $.post("/Room/AddUser", { id: roomId, userId: userId })
         .done(function(data) {
 
@@ -82,6 +83,40 @@ $(".acceptRequest").click(function() {
             }
         })
 });
+
+$(".user-accept-request").click(function() {
+    
+    var toDel = $(this).closest(".request-div");
+    var roomId = toDel.find(".room-id").text();
+
+    $.post("/Room/AddUser", { id: roomId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+                toDel.remove();
+            }
+        })
+});
+
+$(".user-decline-request").click(function() {
+
+    var toDel = $(this).closest(".request-div");
+    var roomId = toDel.find(".room-id").text();
+
+    $.post("/Account/Decline", { roomId: roomId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+                toDel.remove();
+            }
+        })
+})
 
 //  другая кнопка на странице управления - отправляет пост запрос на сервер который только
 //  обновляет статус запроса в таблице запросов

@@ -1,0 +1,42 @@
+@{
+    ViewData["Title"] = "Requests";
+}
+
+@model IEnumerable<Request>
+
+<div class="container room-holder">
+
+@foreach (var item in Model)
+{
+    <div class="container separate-div request-div">
+        <p class="room-id" hidden>@item.Room.Id</p>
+        <div class="row">
+            <div class="col-5 content-div">
+                <p>@item.Room.Name</p>
+            </div>
+            <div class="col content-div">
+                <p>Organization: @item.Room.Company</p>
+            </div>
+            <div class="col content-div">
+                <p>Admin: @item.Room.Admin.Name @item.Room.Admin.Surname</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col content-div">
+                <p>@item.Room.About</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-9 content-div">
+                <p>Request comment: @item.Comment</p>
+            </div>
+            <div class="col join-btn-holder">
+                <button type="button" class="btn btn-primary join-room-btn user-accept-request">Accept</button>
+            </div>
+            <div class="col join-btn-holder">
+                <button type="button" class="btn btn-danger join-room-btn user-decline-request">Decline</button>
+            </div>
+        </div>
+    </div>
+}
+</div>

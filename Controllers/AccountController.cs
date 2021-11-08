@@ -210,6 +210,39 @@ namespace Cua.Controllers
         }
 
         [Authorize]
+        public async Task<IActionResult> Requests()
+        {
+            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
+            List<Request> requests = await db.Requests.Include(rq => rq.Room)
+                .ThenInclude(r => r.Admin)
+                .Where(rq=> rq.UserId == user.Id
+                    && !rq.Checked
+                    && rq.FromRoom)
+                .ToListAsync();
+            return View(requests);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Decline(int roomId)
+        {
+            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
+            Request request = await db.Requests.FirstOrDefaultAsync(rq => rq.UserId == user.Id
+                && rq.RoomId == roomId
+                && rq.FromRoom
+                && !rq.Checked);
+            
+            if (request != null)
+            {
+                request.Checked = true;
+                db.Requests.Update(request);
+                await db.SaveChangesAsync();
+                return Json("OK");
+            }
+            Console.Write("Can't find request");
+            return Json(null);
+        }
+
+        [Authorize]
         public async Task<JsonResult> UpdateInfo(string name, string surname, string company)
         {
             User user = await _authorizer.GetCurrentUserAsync(HttpContext);

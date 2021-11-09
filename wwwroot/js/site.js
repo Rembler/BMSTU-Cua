@@ -411,9 +411,41 @@ $(".change-description").click(function() {
     $(".save-changes").show();
 });
 
+$(".save-queue-changes").click(function() {
+
+    var newName = $("#queue-name-input").val();
+    var newLimit = $("#limit-input").val();
+    var newStartAt = $("#start-at-input").val();
+    var url = window.location.href;
+    var queueId = url.substring(url.lastIndexOf('/') + 1);
+
+    $.post("/Queue/Update", { id: queueId, newName: newName, newLimit: newLimit, newStartAt: newStartAt })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+
+                $("#queue-name-info > p").text(newName);
+                $("#limit-info > p").text("Limit: " + newLimit);
+                $("#start-at-info > p").text(moment(newStartAt).format('DD.MM.YYYY HH:mm'));
+                $(".my-info-div").show();
+
+                $("#queue-name-input").val(newName);
+                $("#limit-input").val(newLimit);
+                $("#start-at-input").val(newStartAt);
+                $(".my-control-input-holder").hide();
+
+                $(".save-changes").hide();
+                $(".change-description").show();
+            }
+        })
+});
+
 //  кнопка сохраняющая сделанные изменения в информции о комнате - отправляет пост
 //  запрос на сервер который меняет соответствующие поля
-$(".save-changes").click(function() {
+$(".save-room-changes").click(function() {
 
     var newName = $("#room-name-input").val();
     var newCompany = $("#company-name-input").val();
@@ -447,7 +479,7 @@ $(".save-changes").click(function() {
 
 //  крест напротив имени пользователя - отправляет пост запрос на сервер который
 //  удаляет связь между данными комнатой и пользователем
-$(".delete-user").click(function() {
+$(".delete-room-user").click(function() {
 
     var clickedUser = $(this).closest(".my-participant-div");
     var userId = clickedUser.find(".user-id").text();
@@ -455,6 +487,26 @@ $(".delete-user").click(function() {
     var roomId = url.substring(url.lastIndexOf('/') + 1);
 
     $.post("/Room/DeleteUser", { id: roomId, userId: userId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+
+                clickedUser.remove();
+            }
+        })
+});
+
+$(".delete-queue-user").click(function() {
+
+    var clickedUser = $(this).closest(".my-participant-div");
+    var userId = clickedUser.find(".user-id").text();
+    var url = window.location.href;
+    var queueId = url.substring(url.lastIndexOf('/') + 1);
+
+    $.post("/Queue/RemoveUser", { id: queueId, userId: userId })
         .done(function(data) {
 
             if (data == null) {
@@ -483,6 +535,24 @@ $(".delete-queue").click(function() {
                 console.log("Status: " + data);
 
                 clickedQueue.remove();
+            }
+        })
+});
+
+$(".delete-timetable").click(function() {
+
+    var clickedTimetable = $(this).closest(".my-participant-div");
+    var timetableId = clickedTimetable.find(".timetable-id").text();
+
+    $.post("/Timetable/Delete", { id: timetableId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+
+                clickedTimetable.remove();
             }
         })
 });
@@ -795,9 +865,12 @@ $(".appointment-item").click(function() {
 
 $("#confirm-appointment-settings").click(function() {
 
+    var url = window.location.href;
+    var id = url.substring(url.lastIndexOf('/') + 1);
+
     var jsonObj = {
         Days: [],
-        TimetableId: window.location.href.slice(-1)
+        TimetableId: id
     };
 
     $(".my-day-holder").each(function(index) {

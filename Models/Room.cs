@@ -13,6 +13,7 @@ namespace Cua.Models
         public int AdminId { get; set; }
         public User Admin { get; set; }
         public ICollection<Queue> Queues { get; set; }
+        public ICollection<Timetable> Timetables { get; set; }
         public ICollection<RoomUser> RoomUsers { get; set; }
         public ICollection<Request> Requests { get; set; }
         public Room()
@@ -20,6 +21,7 @@ namespace Cua.Models
             RoomUsers = new List<RoomUser>();
             Queues = new List<Queue>();
             Requests = new List<Request>();
+            Timetables = new List<Timetable>();
         }
     }
 }

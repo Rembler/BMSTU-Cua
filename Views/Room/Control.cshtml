@@ -53,7 +53,7 @@
                                     <ion-icon name="thumbs-down-outline"></ion-icon>
                                 </a>
                             }
-                            <a class="delete-user" href="#" onclick="return false;"><ion-icon name="close-outline"></ion-icon></a>
+                            <a class="my-delete-user-link delete-room-user" href="#" onclick="return false;"><ion-icon name="close-outline"></ion-icon></a>
                         }
                     </div> 
                 }
@@ -81,7 +81,7 @@
             <div class="separate-div">
                 <div class="row">
                     <div class="col-4 my-show-queues-btn-holder">
-                        <button type="button" class="btn btn-primary save-changes my-qs-btn" style="display: none;">Save changes</button>
+                        <button type="button" class="btn btn-primary save-changes save-room-changes my-qs-btn" style="display: none;">Save changes</button>
                         <button type="button" class="btn btn-primary change-description my-qs-btn">Change description</button>
                     </div>
                     <div class="col-4 my-show-queues-btn-holder">
@@ -117,7 +117,16 @@
                     <div class="content-div my-participant-div">
                         <p>Queue "@item.Name" (Participants: @item.QueueUsers.Count())</p>
                         <p class="queue-id" hidden>@item.Id</p>
+                        <a asp-action="Settings" asp-controller="Queue" asp-route-id=@item.Id class="my-queue-settings"><ion-icon name="settings-outline"></ion-icon></a>
                         <a class="delete-queue" href="#" onclick="return false;"><ion-icon name="close-outline"></ion-icon></a>
+                    </div> 
+                }
+                @foreach (var item in Model.Timetables)
+                {
+                    <div class="content-div my-participant-div">
+                        <p>Timetable "@item.Name" (Available for booking: @item.Appointments.Where(a => a.IsAvailable).Count())</p>
+                        <p class="timetable-id" hidden>@item.Id</p>
+                        <a class="delete-timetable" href="#" onclick="return false;"><ion-icon name="close-outline"></ion-icon></a>
                     </div> 
                 }
             </div>

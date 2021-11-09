@@ -60,6 +60,23 @@ namespace Cua.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (!_authorizer.IsTimetableCreator(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not creator of this timetable"});
+
+            Timetable removedTimetable = await db.Timetables.FindAsync(id);
+
+            if (removedTimetable != null)
+            {
+                db.Timetables.Remove(removedTimetable);
+                await db.SaveChangesAsync();
+                return Json("OK");
+            }
+            Console.Write("Can't find timetable with ID = " + id);
+            return Json(null);
+        }
+
         [HttpGet]
         public IActionResult AppointmentSettings(int id)
         {
@@ -105,6 +122,8 @@ namespace Cua.Controllers
                         IsAvailable = model.Days.FirstOrDefault(d => d.WeekDay == weekDay).Appointments[index] == 1
                     };
                     db.Appointments.Add(newAppointment);
+
+                    index++;
                 }
             }
             db.SaveChanges();

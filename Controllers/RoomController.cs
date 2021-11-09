@@ -344,6 +344,10 @@ namespace Cua.Controllers
                 .Include(q => q.QueueUsers)
                 .Where(q => q.Room == model.Room && q.Creator == user)
                 .ToList();
+            model.Timetables = db.Timetables
+                .Include(t => t.Appointments)
+                .Where(t => t.Room == model.Room && t.Creator == user)
+                .ToList();
             return View(model);
         }
 

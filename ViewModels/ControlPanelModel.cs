@@ -9,5 +9,6 @@ namespace Cua.ViewModels
         public User CurrentUser { get; set; }
         public List<Request> Requests { get; set; }
         public List<Queue> Queues { get; set; }
+        public List<Timetable> Timetables { get; set; }
     }
 }

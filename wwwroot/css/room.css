@@ -51,15 +51,19 @@ div.content-div a {
     font-size: 30px;
 }
 
-div.content-div a.delete-user, a.delete-queue, a.my-undo-moderator {
+div.content-div a.my-delete-user-link, 
+a.delete-queue, a.my-undo-moderator,
+a.delete-timetable {
     color: red;
 }
 
-div.content-div a.queue-control, a.my-make-moderator {
+div.content-div a.queue-control,
+a.my-make-moderator, a.my-queue-settings {
     color: #007bff;
 }
 
-a.my-make-moderator, a.my-undo-moderator {
+a.my-make-moderator, a.my-undo-moderator,
+a.my-queue-settings {
     font-size: 25px !important;
 }
 

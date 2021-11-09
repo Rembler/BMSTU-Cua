@@ -113,6 +113,21 @@
                     }
                     index++;
                 }
+                @foreach (var timetable in item.Timetables)
+                {
+                    if (index % 2 == 0)
+                    {
+                        @Html.Raw("<div class=\"row\">");
+                    }
+                    <div class="col content-div room-activity">
+                        <p>Timetable "@timetable.Name" (From @timetable.StartDate.ToString("dd.MM.yyyy") to @timetable.EndDate.ToString("dd.MM.yyyy"))</p>
+                    </div>
+                    if (index % 2 != 0)
+                    {
+                        @Html.Raw("</div>");
+                    }
+                    index++;
+                }
                 @if (index % 2 != 0)
                 {
                     @Html.Raw("</div>");

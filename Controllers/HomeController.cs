@@ -34,6 +34,7 @@ namespace Cua.Controllers
                 .Include(r => r.Admin)
                 .Include(r => r.RoomUsers)
                 .Include(r => r.Queues)
+                .Include(r => r.Timetables)
                 .AsSplitQuery()
                 .Where(r => r.Admin == user)
                 .ToList();
@@ -41,6 +42,7 @@ namespace Cua.Controllers
                 .Include(r => r.Admin)
                 .Include(r => r.RoomUsers)
                 .Include(r => r.Queues)
+                .Include(r => r.Timetables)
                 .AsSplitQuery()
                 .Where(r => r.RoomUsers.Any(ru => ru.UserId == user.Id))
                 .ToList()).ToList();

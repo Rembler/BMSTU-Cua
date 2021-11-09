@@ -78,6 +78,40 @@ namespace Cua.Controllers
             return Json(null);
         }
 
+        public async Task<IActionResult> Settings(int id)
+        {
+            if (!_authorizer.IsQueueCreator(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not creator of this queue"});
+
+            Queue queue = await db.Queues
+                .Include(q => q.QueueUsers)
+                    .ThenInclude(qu => qu.User)
+                .FirstOrDefaultAsync(q => q.Id ==id);
+                
+            return View(queue);
+        }
+
+        public async Task<IActionResult> Update(int id, string newName, int newLimit, DateTime newStartAt)
+        {
+            if (!_authorizer.IsQueueCreator(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not creator of this queue"});
+
+            Queue updatedQueue = await db.Queues.FindAsync(id);
+
+            if (updatedQueue != null)
+            {
+                updatedQueue.Name = newName;
+                updatedQueue.Limit = newLimit > 0 ? newLimit : 0;
+                updatedQueue.StartAt = newStartAt;
+
+                db.Queues.Update(updatedQueue);
+                await db.SaveChangesAsync();
+
+                return Json("OK");
+            }
+            return Json(null);
+        }
+
         public async Task<IActionResult> Join(int id, int roomId)
         {
             if (!_authorizer.IsMember(HttpContext, roomId))
@@ -183,7 +217,7 @@ namespace Cua.Controllers
                     db.QueueUsers.Remove(removedUser);
                     queueUsers.Remove(removedUser);
 
-                    foreach (var item in queueUsers)
+                    foreach (var item in queueUsers.Where(qu => qu.Place > removedUser.Place))
                         item.Place--;
                     db.QueueUsers.UpdateRange(queueUsers);
                     

@@ -42,7 +42,7 @@ namespace Cua.Controllers
 
             if (ModelState.IsValid)
             {
-                User creator = await db.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+                User creator = await _authorizer.GetCurrentUserAsync(HttpContext);
                 Room room = await db.Rooms.FindAsync(model.RoomId);
                 Queue queue = new Queue() {
                     Name = model.Name,
@@ -61,7 +61,7 @@ namespace Cua.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            if (!_authorizer.IsCreator(HttpContext, id))
+            if (!_authorizer.IsQueueCreator(HttpContext, id))
                 return RedirectToAction("Warning", "Home", new { message = "You are not creator of this queue"});
 
             Queue removedQueue = await db.Queues.FindAsync(id);
@@ -107,7 +107,7 @@ namespace Cua.Controllers
 
         public IActionResult ChangeActiveStatus(int id)
         {
-            if (!_authorizer.IsCreator(HttpContext, id))
+            if (!_authorizer.IsQueueCreator(HttpContext, id))
                 return RedirectToAction("Warning", "Home", new { message = "You are not creator of this queue"});
 
             Queue queue = db.Queues.Find(id);
@@ -167,7 +167,7 @@ namespace Cua.Controllers
                 QueueUser removedUser;
                 if (userId != null)
                 {
-                    if (!_authorizer.IsCreator(HttpContext, id))
+                    if (!_authorizer.IsQueueCreator(HttpContext, id))
                         return RedirectToAction("Warning", "Home", new { message = "You are not creator of this queue"});
 
                     removedUser = queueUsers.FirstOrDefault(qu => qu.UserId == userId);

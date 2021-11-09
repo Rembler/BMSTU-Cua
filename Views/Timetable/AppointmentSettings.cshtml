@@ -1,0 +1,47 @@
+@{
+    ViewData["Title"] = "Appointment settings";
+}
+
+@model List<string>
+
+@{ List<string> weekDays = new List<string> { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" }; }
+
+<div class="container">
+    <div class="row">
+        <div class="col-11">
+    @{ int j = 0; }
+    @foreach (var item in weekDays)
+    {
+    <div class="row">
+        <div class="col-2 separate-div">
+            <div class="col content-div">
+                <p>@item</p>
+            </div>
+        </div>
+        <div class="col-10">
+            <div class="separate-div">
+                <div class="my-day-holder">
+                    @{ int i = 0; }
+                    @while (i + 1 < Model.Count())
+                    {
+                        <div id="@j-@i-0" class="my-appointment appointment-item">
+                            <p>@Model[i]</p>
+                            <p>-</p>
+                            @{ i++; }
+                            <p>@Model[i]</p>
+                        </div>
+                    }    
+                </div>
+            </div>
+        </div>
+    </div>
+    j++;
+    }
+    </div>
+    <div class="col-1 separate-div">
+        <button type="button" id="confirm-appointment-settings" class="btn btn-primary my-tall-btn">
+            <ion-icon name="caret-forward-outline"></ion-icon>
+        </button>
+    </div>
+    </div>
+</div>

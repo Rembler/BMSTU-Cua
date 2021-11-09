@@ -16,15 +16,19 @@ namespace Cua.Models
         public ICollection<Room> AdminRooms { get; set; }
         public ICollection<RoomUser> RoomUsers { get; set; }
         public ICollection<Queue> CreatedQueues { get; set; }
+        public ICollection<Timetable> CreatedTimetables { get; set; }
         public ICollection<QueueUser> QueueUsers { get; set; }
         public ICollection<Request> Requests { get; set; }
+        public ICollection<Appointment> Appointments { get; set; }
         public User()
         {
             CreatedQueues = new List<Queue>();
+            CreatedTimetables = new List<Timetable>();
             RoomUsers = new List<RoomUser>();
             AdminRooms = new List<Room>();
             QueueUsers = new List<QueueUser>();
             Requests = new List<Request>();
+            Appointments = new List<Appointment>();
         }
     }
 }

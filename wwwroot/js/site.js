@@ -777,3 +777,55 @@ $("#send-request-to-user").click(function() {
             }
         })
 });
+
+$(".appointment-item").click(function() {
+
+    var id = $(this).attr("id");
+
+    if (id.slice(-1) == 0) {
+        id = id.slice(0, -1) + "1";
+        $(this).addClass("checked");
+    } else {
+        id = id.slice(0, -1) + "0";
+        $(this).removeClass("checked");
+    }
+
+    $(this).attr("id", id);
+});
+
+$("#confirm-appointment-settings").click(function() {
+
+    var jsonObj = {
+        Days: [],
+        TimetableId: window.location.href.slice(-1)
+    };
+
+    $(".my-day-holder").each(function(index) {
+
+        var day = {
+            WeekDay: $(this).closest(".row").find(".col-2").find("p").text(),
+            Appointments: []
+        };
+        $(this).children().each(function() {
+
+            if ($(this).hasClass("checked")) {
+                day.Appointments.push(1);
+            } else {
+                day.Appointments.push(0);
+            }
+        })
+        jsonObj.Days.push(day);
+    })
+
+    $.ajax({
+        type: "POST",
+        data: JSON.stringify(jsonObj),
+        url: "/Timetable/AppointmentSettings",
+        contentType: "application/json",
+        success: function (result) { 
+            if (result.redirectUrl !== undefined) {
+                window.location.replace(result.redirectUrl);
+            }
+        }
+    });
+});

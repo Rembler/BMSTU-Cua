@@ -97,7 +97,7 @@
                         <a asp-action="Candidates" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Add participants</button></a>
                     </div>
                     <div class="col-4 my-show-queues-btn-holder">
-                        <a href="#" onclick="return false;" ><button type="button" class="btn btn-primary my-qs-btn">Create schedule</button></a>
+                        <a asp-action="Create" asp-controller="Timetable" asp-route-roomId=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Create timetable</button></a>
                     </div>
                     @if (Model.Room.Admin == Model.CurrentUser)
                     {

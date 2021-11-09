@@ -58,12 +58,23 @@ namespace Cua.Services
                 return false;
         }
 
-        public bool IsCreator(HttpContext httpContext, int queueId)
+        public bool IsQueueCreator(HttpContext httpContext, int queueId)
         {
             Queue queue = db.Queues.Find(queueId);
             User user = GetCurrentUser(httpContext);
 
             if (queue.CreatorId == user.Id)
+                return true;
+            else
+                return false;
+        }
+
+        public bool IsTimetableCreator(HttpContext httpContext, int timetableId)
+        {
+            Timetable timetable = db.Timetables.Find(timetableId);
+            User user = GetCurrentUser(httpContext);
+
+            if (timetable.CreatorId == user.Id)
                 return true;
             else
                 return false;

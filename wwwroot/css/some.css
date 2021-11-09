@@ -139,3 +139,39 @@
 .my-user-count {
     padding-left: 5px;
 }
+
+.my-day-holder {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.my-appointment {
+    display: inline-block;
+    width: 80px;
+    background-color: #35495a;
+    color: white;
+    margin: 0 5px;
+    border-radius: 5px;
+    padding: 5px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.my-appointment.checked {
+    background-color: #214a80;
+}
+
+.my-appointment p {
+    margin: 0;
+}
+
+.my-day-holder::-webkit-scrollbar {
+    display: none;
+}
+
+.my-tall-btn {
+    height: 100%;
+    width: 100%;
+    font-size: 30px;
+}

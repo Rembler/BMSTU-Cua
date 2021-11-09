@@ -11,6 +11,8 @@ namespace Cua.Models
         public DbSet<RoomUser> RoomUsers { get; set; }
         public DbSet<Request> Requests { get; set; }
         public DbSet<Message> Messages { get; set ;}
+        public DbSet<Timetable> Timetables { get; set; }
+        public DbSet<Appointment> Appointments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,6 +26,12 @@ namespace Cua.Models
                 .HasOne(q => q.Creator)
                 .WithMany(u => u.CreatedQueues)
                 .HasForeignKey(q => q.CreatorId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Timetable>()
+                .HasOne(t => t.Creator)
+                .WithMany(u => u.CreatedTimetables)
+                .HasForeignKey(t => t.CreatorId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<QueueUser>()

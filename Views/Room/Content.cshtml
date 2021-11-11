@@ -55,14 +55,23 @@
                 </div>
             </div>
             <div class="separate-div">
+                @if (Model.CurrentUser == Model.Room.Admin || Model.Room.RoomUsers.Where(ru => ru.IsModerator).Any(ru => ru.User == Model.CurrentUser))
+                {
+                    <div class="row">
+                        <div class="col my-show-queues-btn-holder">
+                            <a asp-action="Control" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Control panel</button></a>
+                        </div>
+                    </div>
+                }
+                <br/>
                 <div class="row">
                     <div class="col-6 my-show-queues-btn-holder">
-                        <a asp-action="Queues" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">View all queues</button></a>
+                        <a asp-action="Activities" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">View all activities</button></a>
                     </div>
-                    @if (Model.CurrentUser == Model.Room.Admin || Model.Room.RoomUsers.Where(ru => ru.IsModerator).Any(ru => ru.User == Model.CurrentUser))
+                    @if (Model.CurrentUser != Model.Room.Admin)
                     {
                         <div class="col-6 my-show-queues-btn-holder">
-                            <a asp-action="Control" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Control panel</button></a>
+                            <a asp-action="RemoveUser" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-danger my-qs-btn">Leave room</button></a>
                         </div>
                     }
                 </div>

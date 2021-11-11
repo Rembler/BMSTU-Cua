@@ -902,3 +902,41 @@ $("#confirm-appointment-settings").click(function() {
         }
     });
 });
+
+$(".cancel-appointment").click(function() {
+
+    var timetableId = $(this).closest(".room-for-join-div").find(".hidden-p").text();
+    var row = $(this).closest(".row");
+
+    $.post("/Timetable/RemoveUser", { id: timetableId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+
+                row.find(".cancel-appointment").hide();
+                row.find(".make-appointment").show();
+                row.find(".own-appointment").hide();
+                row.find(".available-appoinments").show();
+            }
+        })
+});
+
+$(".activity-radio").click(function() {
+
+    var status = $(this).is(":checked");
+    var unwantedName = $(this).attr("id").slice(0, $(this).attr("id").indexOf("-"));
+    var activities = $("#items-holder"),
+        activitiesList = activities.children();
+
+    activitiesList.each(function() {
+        var activityName = $(this).find(".my-content-label-div p").text();
+        if (activityName.toUpperCase() != unwantedName.toUpperCase() && status) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
+});

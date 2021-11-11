@@ -58,12 +58,12 @@ a.delete-timetable {
 }
 
 div.content-div a.queue-control,
-a.my-make-moderator, a.my-queue-settings {
+a.my-make-moderator, a.my-settings-link {
     color: #007bff;
 }
 
 a.my-make-moderator, a.my-undo-moderator,
-a.my-queue-settings {
+a.my-settings-link {
     font-size: 25px !important;
 }
 
@@ -82,7 +82,7 @@ a.my-undo-moderator {
 }
 
 .chat-div {
-    height: 400px;
+    height: 380px;
     overflow-y: auto;
 }
 

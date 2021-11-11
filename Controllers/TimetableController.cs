@@ -77,6 +77,48 @@ namespace Cua.Controllers
             return Json(null);
         }
 
+        public IActionResult Schedule(int id)
+        {
+            Timetable timetable = db.Timetables.Include(t => t.Appointments).FirstOrDefault(t => t.Id == id);
+            return View(timetable);
+        }
+
+        public IActionResult AddUser(int id, DateTime startAt)
+        {
+            Timetable timetable = db.Timetables.Find(id);
+
+            if (!_authorizer.IsMember(HttpContext, timetable.RoomId))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+
+            Appointment appointment = db.Appointments.FirstOrDefault(a => a.TimetableId == timetable.Id && a.StartAt == startAt);
+            User user = _authorizer.GetCurrentUser(HttpContext);
+
+            appointment.User = user;
+            appointment.IsAvailable = false;
+            db.Appointments.Update(appointment);
+            db.SaveChanges();
+
+            return Json(new { redirectUrl = Url.Action("Activities", "Room", new { id = timetable.RoomId }) });
+        }
+
+        public async Task<IActionResult> RemoveUser(int id)
+        {
+            Timetable timetable = await db.Timetables.FindAsync(id);
+
+            if (!_authorizer.IsMember(HttpContext, timetable.RoomId))
+                return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+
+            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
+            Appointment appointment = await db.Appointments.FirstOrDefaultAsync(a => a.TimetableId == timetable.Id && a.UserId == user.Id);
+
+            appointment.User = null;
+            appointment.IsAvailable = true;
+            db.Appointments.Update(appointment);
+            await db.SaveChangesAsync();
+
+            return Json("OK");
+        }
+
         [HttpGet]
         public IActionResult AppointmentSettings(int id)
         {
@@ -115,19 +157,45 @@ namespace Cua.Controllers
                     startAt = endAt;
                     endAt = item;
                     
-                    Appointment newAppointment = new Appointment() {
-                        StartAt = startAt,
-                        EndAt = endAt,
-                        Timetable = timetable,
-                        IsAvailable = model.Days.FirstOrDefault(d => d.WeekDay == weekDay).Appointments[index] == 1
-                    };
-                    db.Appointments.Add(newAppointment);
+                    if (model.Days.FirstOrDefault(d => d.WeekDay == weekDay).Appointments[index] == 1)
+                    {
+                        Appointment newAppointment = new Appointment() {
+                            StartAt = startAt,
+                            EndAt = endAt,
+                            Timetable = timetable,
+                            IsAvailable = true
+                        };
+                        db.Appointments.Add(newAppointment);
+                    }
 
                     index++;
                 }
             }
             db.SaveChanges();
             return Json(new { redirectUrl = Url.Action("Control", "Room", new { id = timetable.RoomId }) });
+        }
+
+        public JsonResult GetAvailableDates(int id)
+        {
+            List<string> availableDates = db.Appointments
+                .Where(a => a.TimetableId == id && a.IsAvailable)
+                .Select(a => a.StartAt.ToString("dd-MM-yyyy"))
+                .Distinct()
+                .ToList();
+            return Json(availableDates);
+        }
+
+        public JsonResult GetAvailableTime(int id, DateTime date)
+        {
+            List<string> availableTime = db.Appointments
+                .Where(a => a.TimetableId == id 
+                    && a.StartAt.Date == date.Date 
+                    && a.IsAvailable)
+                .Select(a => a.StartAt.ToString("HH:mm")
+                    + " - "
+                    + a.StartAt.AddMinutes(a.Timetable.AppointmentDuration).ToString("HH:mm"))
+                .ToList();
+            return Json(availableTime);
         }
 
         private IEnumerable<DateTime> EachAppointment(DateTime startTime, DateTime endTime, int step) {  

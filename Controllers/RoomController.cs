@@ -359,20 +359,26 @@ namespace Cua.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Queues(int id)
+        public async Task<IActionResult> Activities(int id)
         {
             if (!_authorizer.IsMember(HttpContext, id))
                 return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
 
-            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
-            ViewBag.CurrentUser = user;
-            List<Queue> queues = await db.Queues
-                .Include(q => q.Creator)
-                .Include(q => q.QueueUsers)
-                .ThenInclude(qu => qu.User)
-                .Where(q => q.RoomId == id)
-                .ToListAsync();
-            return View(queues);
+            ActivitiesModel model = new ActivitiesModel() {
+                CurrentUser = await _authorizer.GetCurrentUserAsync(HttpContext),
+                Queues = await db.Queues
+                    .Include(q => q.Creator)
+                    .Include(q => q.QueueUsers)
+                    .ThenInclude(qu => qu.User)
+                    .Where(q => q.RoomId == id)
+                    .ToListAsync(),
+                Timetables = await db.Timetables
+                    .Include(t => t.Appointments)
+                    .Where(t => t.RoomId == id)
+                    .ToListAsync()
+            };
+
+            return View(model);
         }
 
         public async Task<IActionResult> GetAvailableUsers(int id, string searchedName, string searchedCompany)

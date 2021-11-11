@@ -109,7 +109,7 @@
             </div>
             <br/>
             <div class="separate-div separate-div-no-col">
-                <div class="content-div my-content-label-div"><p>My queues</p></div>
+                <div class="content-div my-content-label-div"><p>My queues and timetables</p></div>
             </div>
             <div class="separate-div separate-div-no-col">
                 @foreach (var item in Model.Queues)
@@ -117,7 +117,7 @@
                     <div class="content-div my-participant-div">
                         <p>Queue "@item.Name" (Participants: @item.QueueUsers.Count())</p>
                         <p class="queue-id" hidden>@item.Id</p>
-                        <a asp-action="Settings" asp-controller="Queue" asp-route-id=@item.Id class="my-queue-settings"><ion-icon name="settings-outline"></ion-icon></a>
+                        <a asp-action="Settings" asp-controller="Queue" asp-route-id=@item.Id class="my-settings-link"><ion-icon name="settings-outline"></ion-icon></a>
                         <a class="delete-queue" href="#" onclick="return false;"><ion-icon name="close-outline"></ion-icon></a>
                     </div> 
                 }
@@ -126,6 +126,7 @@
                     <div class="content-div my-participant-div">
                         <p>Timetable "@item.Name" (Available for booking: @item.Appointments.Where(a => a.IsAvailable).Count())</p>
                         <p class="timetable-id" hidden>@item.Id</p>
+                        <a asp-action="Settings" asp-controller="Timetable" asp-route-id=@item.Id class="my-settings-link"><ion-icon name="settings-outline"></ion-icon></a>
                         <a class="delete-timetable" href="#" onclick="return false;"><ion-icon name="close-outline"></ion-icon></a>
                     </div> 
                 }

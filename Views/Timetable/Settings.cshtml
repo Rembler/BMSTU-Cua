@@ -1,0 +1,68 @@
+@{
+    ViewData["Title"] = "Timetable settings";
+}
+
+@model Cua.Models.Timetable
+
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+            <div class="separate-div separate-div-no-col">
+                <div class="content-div my-content-label-div"><p>Future appointments:</p></div>
+            </div>
+            <div class="separate-div separate-div-no-col">
+                @foreach (var item in Model.Appointments.Where(a => a.User != null))
+                {
+                    <div class="content-div my-participant-div">
+                        <p>@item.User.Name @item.User.Surname (@item.StartAt.ToString("dd.MM.yyyy HH:mm"))</p>
+                        <p class="user-id" hidden>@item.Id</p>
+                        <a class="my-delete-user-link delete-appointment-user" href="#" onclick="return false;"><ion-icon name="close-outline"></ion-icon></a>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="col">
+            <div class="separate-div">
+                <div class="row">
+                    <div class="col my-control-input-holder" style="display: none;">
+                        <input id="timetable-name-input" type="text" class="my-input" value="@Model.Name" placeholder="Timetable name" />
+                    </div>
+                    <div id="timetable-name-info" class="col content-div my-info-div"><p>@Model.Name</p></div>
+                    <div id="timetable-dates-info" class="col content-div">
+                        <p>@Model.StartDate.ToString("dd.MM.yyyy") - @Model.EndDate.ToString("dd.MM.yyyy")</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="appointment-duration-info" class="col content-div"><p>Appointment duration: @Model.AppointmentDuration</p></div>
+                    <div id="break-duration-info" class="col content-div"><p>BreakDuration: @Model.BreakDuration</p></div>
+                </div>
+            </div>
+            <div class="separate-div">
+                <div class="row">
+                    <div class="col my-show-queues-btn-holder">
+                        <button type="button" class="btn btn-primary save-changes save-timetable-changes my-qs-btn" style="display: none;">Save changes</button>
+                        <button type="button" class="btn btn-primary change-description my-qs-btn">Change name</button>
+                    </div>
+                    <div class="col my-show-queues-btn-holder">
+                        <a id="appointment-settings-link" asp-action="AppointmentSettings" asp-controller="Timetable" asp-route-id=@Model.Id>
+                            <button type="button" id="continue-extend-timetable" class="btn btn-primary my-qs-btn" style="display: none;" disabled>Continue</button>
+                        </a>
+                        <button id="extend-timetable" type="button" class="btn btn-primary my-qs-btn">Extend the timetable</button>
+                    </div>
+                    <div class="col my-show-queues-btn-holder">
+                        <a asp-action="Control" asp-controller="Room" asp-route-id=@Model.RoomId><button type="button" class="btn btn-primary my-qs-btn">Back</button></a>
+                    </div>
+                </div>
+            </div>
+            <div id="new-end-date-input-holder" class="separate-div" style="display: none;">
+                <div class="row">
+                    <div class="col my-input-holder">
+                        <input type="text" id="datepicker" class="my-input" placeholder="Choose new end date" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/timetable-settings-date.js" asp-append-version="true"></script>

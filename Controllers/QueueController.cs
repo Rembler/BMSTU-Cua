@@ -112,7 +112,7 @@ namespace Cua.Controllers
             return Json(null);
         }
 
-        public async Task<IActionResult> Join(int id, int roomId)
+        public async Task<IActionResult> AddUser(int id, int roomId)
         {
             if (!_authorizer.IsMember(HttpContext, roomId))
                 return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
@@ -124,15 +124,19 @@ namespace Cua.Controllers
             int place = alreadyIn.Any() ? alreadyIn.Max(qu => qu.Place) + 1 : 1;
             if (user != null && queue != null)
             {
-                // var roomUsers = db.Users.Where(u => u.Rooms.Any(r => r.Id == id)).ToList();
-                if (!queue.QueueUsers.Any(qu => qu.User == user))
+                if (queue.Limit == 0 || queue.Limit > queue.QueueUsers.Count())
                 {
-                    QueueUser queueUser = new QueueUser() { User = user, Queue = queue, Place = place };
-                    db.QueueUsers.Update(queueUser);
-                    await db.SaveChangesAsync();
-                    return Json("OK");
+                    if (!queue.QueueUsers.Any(qu => qu.User == user))
+                    {
+                        QueueUser queueUser = new QueueUser() { User = user, Queue = queue, Place = place };
+                        db.QueueUsers.Update(queueUser);
+                        await db.SaveChangesAsync();
+                        return Json("OK");
+                    }
+                    Console.Write("User already in the queue");
+                    return Json(null);
                 }
-                Console.Write("User already in the queue");
+                Console.Write("Queue limit was reached");
                 return Json(null);
             }
             Console.Write("No such user or queue");

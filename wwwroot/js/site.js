@@ -146,7 +146,7 @@ $("#addQueue").click(function() {
     var url = window.location.href;
     var roomId = url.substring(url.lastIndexOf('/') + 1);
 
-    $.post("/Queue/Join", { id: queueId, roomId: roomId })
+    $.post("/Queue/AddUser", { id: queueId, roomId: roomId })
         .done(function(data) {
 
             if (data == null) {
@@ -866,11 +866,17 @@ $(".appointment-item").click(function() {
 $("#confirm-appointment-settings").click(function() {
 
     var url = window.location.href;
-    var id = url.substring(url.lastIndexOf('/') + 1);
+    var id;
+    if (url.indexOf("?") == -1){
+        id = url.substring(url.lastIndexOf('/') + 1);
+    } else {
+        id = url.substring(url.lastIndexOf("/") + 1, url.indexOf("?"))
+    }
 
     var jsonObj = {
         Days: [],
-        TimetableId: id
+        TimetableId: id,
+        NewEndDate: $("#new-end-date").text()
     };
 
     $(".my-day-holder").each(function(index) {
@@ -889,6 +895,8 @@ $("#confirm-appointment-settings").click(function() {
         })
         jsonObj.Days.push(day);
     })
+
+    console.log(jsonObj);
 
     $.ajax({
         type: "POST",
@@ -939,4 +947,57 @@ $(".activity-radio").click(function() {
             $(this).hide();
         }
     });
+});
+
+$("#extend-timetable").click(function() {
+
+    $(this).hide();
+    $("#continue-extend-timetable").show();
+    $("#new-end-date-input-holder").show();
+});
+
+$(".save-timetable-changes").click(function() {
+
+    var newName = $("#timetable-name-input").val();
+    var url = window.location.href;
+    var timetableId = url.substring(url.lastIndexOf('/') + 1);
+
+    $.post("/Timetable/Update", { id: timetableId, newName: newName })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+
+                $("#timetable-name-info > p").text(newName);
+                $(".my-info-div").show();
+
+                $("#timetable-name-input").val(newName);
+                $(".my-control-input-holder").hide();
+
+                $(".save-changes").hide();
+                $(".change-description").show();
+            }
+        })
+});
+
+$(".delete-appointment-user").click(function() {
+
+    var clickedUser = $(this).closest(".my-participant-div");
+    var appointmentId = clickedUser.find(".user-id").text();
+    var url = window.location.href;
+    var timetableId = url.substring(url.lastIndexOf('/') + 1);
+
+    $.post("/Timetable/RemoveUser", { id: timetableId, appointmentId: appointmentId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+
+                clickedUser.remove();
+            }
+        })
 });

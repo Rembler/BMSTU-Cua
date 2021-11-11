@@ -24,17 +24,17 @@
         <div class="col">
             <div class="separate-div">
                 <div class="row">
-                    <div class="col my-control-input-holder" style="display: none;">
+                    <div class="col my-control-input-holder my-control-input-holder-without-padding" style="display: none;">
                         <input id="queue-name-input" type="text" class="my-input" value="@Model.Name" placeholder="Queue name" />
                     </div>
                     <div id="queue-name-info" class="col content-div my-info-div"><p>@Model.Name</p></div>
                 </div>
                 <div class="row">
-                    <div class="col my-control-input-holder" style="display: none;">
+                    <div class="col my-control-input-holder my-control-input-holder-without-padding" style="display: none;">
                         <input id="limit-input" type="number" class="my-input" value="@Model.Limit" placeholder="Maximum number of participants" />
                     </div>
                     <div id="limit-info" class="col content-div my-info-div"><p>Limit: @Model.Limit</p></div>
-                    <div class="col my-control-input-holder" style="display: none;">
+                    <div class="col my-control-input-holder my-control-input-holder-without-padding" style="display: none;">
                         <input id="start-at-input" type="datetime-local" class="my-input" value=@Model.StartAt.ToString("yyyy-MM-ddTHH:mm") />
                     </div>
                     <div id="start-at-info" class="col content-div my-info-div"><p>@Model.StartAt.ToString("dd.MM.yyyy HH:mm")</p></div>

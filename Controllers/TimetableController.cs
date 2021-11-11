@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Cua.Models;
@@ -55,7 +56,7 @@ namespace Cua.Controllers
                 };
                 db.Timetables.Add(newTimetable);
                 await db.SaveChangesAsync();
-                return RedirectToAction("AppointmentSettings", "Timetable", new { id = newTimetable.Id });
+                return RedirectToAction("AppointmentSettings", "Timetable", new { id = newTimetable.Id, newEndDate = "" });
             }
             return View(model);
         }
@@ -74,6 +75,25 @@ namespace Cua.Controllers
                 return Json("OK");
             }
             Console.Write("Can't find timetable with ID = " + id);
+            return Json(null);
+        }
+
+        public async Task<IActionResult> Update(int id, string newName)
+        {
+            if (!_authorizer.IsTimetableCreator(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not creator of this timetable"});
+
+            Timetable updatedTimetable = await db.Timetables.FindAsync(id);
+
+            if (updatedTimetable != null)
+            {
+                updatedTimetable.Name = newName;
+
+                db.Timetables.Update(updatedTimetable);
+                await db.SaveChangesAsync();
+
+                return Json("OK");
+            }
             return Json(null);
         }
 
@@ -101,15 +121,23 @@ namespace Cua.Controllers
             return Json(new { redirectUrl = Url.Action("Activities", "Room", new { id = timetable.RoomId }) });
         }
 
-        public async Task<IActionResult> RemoveUser(int id)
+        public async Task<IActionResult> RemoveUser(int id, int? appointmentId)
         {
             Timetable timetable = await db.Timetables.FindAsync(id);
 
             if (!_authorizer.IsMember(HttpContext, timetable.RoomId))
                 return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
 
-            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
-            Appointment appointment = await db.Appointments.FirstOrDefaultAsync(a => a.TimetableId == timetable.Id && a.UserId == user.Id);
+            Appointment appointment;
+            if (appointmentId == null)
+            {
+                User user = await _authorizer.GetCurrentUserAsync(HttpContext);
+                appointment = await db.Appointments.FirstOrDefaultAsync(a => a.TimetableId == timetable.Id && a.UserId == user.Id);
+            }
+            else
+            {
+                appointment = await db.Appointments.Include(a => a.User).FirstOrDefaultAsync(a => a.Id == appointmentId);
+            }
 
             appointment.User = null;
             appointment.IsAvailable = true;
@@ -119,18 +147,34 @@ namespace Cua.Controllers
             return Json("OK");
         }
 
+        public async Task<IActionResult> Settings(int id)
+        {
+            if (!_authorizer.IsTimetableCreator(HttpContext, id))
+                return RedirectToAction("Warning", "Home", new { message = "You are not creator of this timetable"});
+
+            Timetable timetable = await db.Timetables
+                .Include(t => t.Appointments)
+                .ThenInclude(a => a.User)
+                .FirstOrDefaultAsync(t => t.Id == id);
+                
+            return View(timetable);
+        }
+
         [HttpGet]
-        public IActionResult AppointmentSettings(int id)
+        public IActionResult AppointmentSettings(int id, string newEndDate)
         {
             Timetable timetable = db.Timetables.Find(id);
             int step = timetable.AppointmentDuration + timetable.BreakDuration;
             DateTime startTime = DateTime.Parse("00:00");
             DateTime endTime = DateTime.Parse("23:59");
+
             List<string> timeList = new List<string>();
             foreach(DateTime item in EachAppointment(startTime, endTime, step))
             {  
                 timeList.Add(item.ToString("t"));  
             }
+
+            ViewBag.NewEndDate = newEndDate;
             return View(timeList);
         }
 
@@ -140,11 +184,13 @@ namespace Cua.Controllers
             if (!_authorizer.IsTimetableCreator(HttpContext, model.TimetableId))
                 return Json(new { redirectUrl = Url.Action("Warning", "Home", new { message = "You are not creator of this timetable" }) });
 
+            Console.Write(" " + model.NewEndDate);
             Timetable timetable = db.Timetables.Find(model.TimetableId);
-            DateTime dayStart = timetable.StartDate, dayEnd = dayStart;
+            DateTime dayStart = model.NewEndDate == "" ? timetable.StartDate : timetable.EndDate, dayEnd = dayStart;
+            DateTime endDate = model.NewEndDate == "" ? timetable.EndDate : DateTime.ParseExact(model.NewEndDate, "dd-MM-yyyy", CultureInfo.InvariantCulture);
             int step = timetable.AppointmentDuration + timetable.BreakDuration;
 
-            foreach(DateTime currentDay in EachDay(dayStart.AddDays(1), timetable.EndDate))
+            foreach(DateTime currentDay in EachDay(dayStart.AddDays(1), endDate))
             {  
                 dayStart = dayEnd;
                 dayEnd = currentDay;
@@ -171,6 +217,13 @@ namespace Cua.Controllers
                     index++;
                 }
             }
+
+            if (model.NewEndDate != "")
+            {
+                timetable.EndDate = endDate;
+                db.Timetables.Update(timetable);
+            }
+
             db.SaveChanges();
             return Json(new { redirectUrl = Url.Action("Control", "Room", new { id = timetable.RoomId }) });
         }

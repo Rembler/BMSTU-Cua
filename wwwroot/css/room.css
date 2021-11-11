@@ -41,7 +41,7 @@
 .my-control-input-holder {
     height: 40px;
     margin: 8px;
-    padding: 0;
+    /* padding: 0; */
 }
 
 div.content-div a {
@@ -111,4 +111,8 @@ p.my-msg-body {
 
 .my-own-msg-div {
     margin-left: auto;
+}
+
+.my-control-input-holder-without-padding {
+    padding: 0;
 }

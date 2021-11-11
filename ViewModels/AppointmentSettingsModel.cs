@@ -6,6 +6,7 @@ namespace Cua.ViewModels
     {
         public int TimetableId { get; set; }
         public List<DayModel> Days { get; set; }
+        public string NewEndDate { get; set; }
     }
 
     public class DayModel

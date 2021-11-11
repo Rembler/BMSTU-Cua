@@ -96,7 +96,14 @@
                         else
                         {
                             <button class="btn btn-danger join-room-btn leave-queue-btn" style="display: none;">Leave</button>
-                            <button class="btn btn-primary join-room-btn id-giver join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter">Join</button>
+                            @if (item.Limit != 0 && item.Limit == item.QueueUsers.Count())
+                            {
+                                <button class="btn btn-primary join-room-btn id-giver join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter" disabled>Join</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-primary join-room-btn id-giver join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter">Join</button>
+                            }
                         }
                     </div>
                 </div>

@@ -50,11 +50,7 @@ namespace Cua.Controllers
             return View(roomsList);
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
+        [AllowAnonymous]
         public IActionResult Warning(string message)
         {
             return View((Object)message);

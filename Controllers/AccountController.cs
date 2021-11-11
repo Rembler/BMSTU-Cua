@@ -98,7 +98,7 @@ namespace Cua.Controllers
                 user.Email,
                 "Восстановление пароля",
                 $"Для восстановления пароля перейдите <a href='{callbackUrl}'>по ссылке</a>.");
-            return Content($"Для восстановления пароля перейдите по ссылке из письма, отправленного на {user.Email}.");
+            return RedirectToAction("Warning", "Home", new { message = $"Для восстановления пароля перейдите по ссылке из письма, отправленного на {user.Email}."});
         }
 
         [HttpGet]
@@ -124,16 +124,20 @@ namespace Cua.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
-            User user = await db.Users.FindAsync(model.UserId);
-            
-            HashSalt hashSalt = EncryptPassword(model.Password);
-            user.Password = hashSalt.Hash;
-            user.StoredSalt = hashSalt.Salt;
-            db.Users.Update(user);
-            await db.SaveChangesAsync();
+            if (ModelState.IsValid)
+            {
+                User user = await db.Users.FindAsync(model.UserId);
+                
+                HashSalt hashSalt = EncryptPassword(model.Password);
+                user.Password = hashSalt.Hash;
+                user.StoredSalt = hashSalt.Salt;
+                db.Users.Update(user);
+                await db.SaveChangesAsync();
 
-            await Authenticate(user.Email);
-            return RedirectToAction("Index", "Home");
+                await Authenticate(user.Email);
+                return RedirectToAction("Index", "Home");
+            }
+            return View(model);
         }
 
         [HttpGet]
@@ -174,8 +178,8 @@ namespace Cua.Controllers
                         model.Email,
                         "Подтверждение адреса электронной почты",
                         $"Для завершения регистрации перейдите <a href='{callbackUrl}'>по ссылке</a>.");
-
-                    return Content($"Для завершения регистрации перейдите по ссылке из письма, отправленного на {model.Email}.");
+                        
+                    return RedirectToAction("Warning", "Home", new { message = $"Для восстановления пароля перейдите по ссылке из письма, отправленного на {user.Email}." });
                 }
                 ModelState.AddModelError("", "Пользователь с такой почтой уже зарегистрирован");
                 return View(model);

@@ -19,6 +19,23 @@
   box-shadow:3px 3px 4px rgba(0,0,0,0.2);
 }
 
+.login-dark .separate-div {
+  border-radius: 4px;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  box-shadow: 3px 3px 4px rgba(0,0,0,0.2);
+}
+
+.login-dark .content-div {
+  margin: auto;
+}
+
+.login-dark .content-div p {
+  padding: 10px 15px;
+}
+
 .login-dark .illustration {
   text-align:center;
   padding:15px 0 20px;

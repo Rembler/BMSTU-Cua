@@ -9,12 +9,10 @@
     <title>Login</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
-    @* <link rel="stylesheet" href="~/css/site.css" /> *@
     <link rel="stylesheet" href="~/css/login.css" />
 </head>
 
 <body>
-    @* <a asp-action="Register" asp-controller="Account">Регистрация</a> *@
     <div class="login-dark">
         <form asp-action="Login" asp-controller="Account" asp-anti-forgery="true" class="login">
             <h2 class="sr-only">Login form</h2>
@@ -35,7 +33,6 @@
             <a class="forgot" asp-action="Register" asp-controller="Account">First time here?</a>
         </form>
     </div>
-    @* <a asp-action="RestorePassword" asp-controller="Account">Забыли пароль?</a> *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -163,7 +163,7 @@ $("#addQueue").click(function() {
 
 $(".leave-queue-btn").click(function() {
 
-    var queueId = $("#got-id").text();
+    var queueId = $(this).closest(".room-for-join-div").find(".hidden-p").text();
 
     $.post("/Queue/RemoveUser", { id: queueId })
     .done(function(data) {

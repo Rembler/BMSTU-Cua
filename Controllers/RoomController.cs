@@ -229,12 +229,23 @@ namespace Cua.Controllers
             return Json(null);
         }
 
-        public async Task<IActionResult> RemoveUser(int id, int userId)
+        public async Task<IActionResult> RemoveUser(int id, int? userId)
         {
-            if (!_authorizer.IsAdmin(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the admin of this room"});
+            User user;
+            if (userId != null)
+            {
+                if (!_authorizer.IsAdmin(HttpContext, id))
+                    return RedirectToAction("Warning", "Home", new { message = "You are not the admin of this room"});
 
-            User user = await db.Users.FindAsync(userId);
+                user = await db.Users.FindAsync(userId);
+            }
+            else
+            {
+                if (!_authorizer.IsMember(HttpContext, id))
+                    return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+
+                user = await _authorizer.GetCurrentUserAsync(HttpContext);
+            }
             Room room = await db.Rooms.FindAsync(id);
 
             if (user != null && room != null)
@@ -242,16 +253,39 @@ namespace Cua.Controllers
                 RoomUser removedRoomUser = await db.RoomUsers.FirstOrDefaultAsync(ru => ru.User == user && ru.Room == room);
                 if (removedRoomUser != null)
                 {
-                    List<Appointment> freedAppointments = await  db.Appointments.Where(a => a.UserId == removedRoomUser.UserId).ToListAsync();
+                    List<Appointment> freedAppointments = await  db.Appointments
+                        .Include(a => a.Timetable)
+                        .Where(a => a.Timetable.RoomId == removedRoomUser.RoomId && a.UserId == removedRoomUser.UserId)
+                        .ToListAsync();
                     foreach (var item in freedAppointments)
                     {
                         item.User = null;
                         item.IsAvailable = true;
                     }
                     db.Appointments.UpdateRange(freedAppointments);
+
+                    List<QueueUser> removedQueueUsers = await db.QueueUsers
+                        .Include(qu => qu.Queue)
+                        .Where(qu => qu.Queue.RoomId == removedRoomUser.RoomId && qu.UserId == removedRoomUser.UserId)
+                        .ToListAsync();
+                    List<QueueUser> updatedQueueUsers = await db.QueueUsers
+                        .Include(qu => qu.Queue)
+                        .Where(qu => qu.Queue.RoomId == removedRoomUser.RoomId)
+                        .ToListAsync();
+                    updatedQueueUsers = updatedQueueUsers.Except(removedQueueUsers).ToList();
+                    foreach (var item in updatedQueueUsers)
+                        if (removedQueueUsers.Any(rqu => rqu.Queue == item.Queue && rqu.Place < item.Place))
+                            item.Place--;
+                    db.QueueUsers.UpdateRange(updatedQueueUsers);
+                    db.QueueUsers.RemoveRange(removedQueueUsers);
+                    
                     db.RoomUsers.Remove(removedRoomUser);
                     await db.SaveChangesAsync();
-                    return Json("OK");
+                    
+                    if (userId != null)
+                        return Json("OK");
+                    else
+                        return RedirectToAction("Index", "Home");
                 }
                 Console.Write("User isn't a member of the room");
                 return Json(null);

@@ -97,12 +97,6 @@ namespace Cua.Controllers
             return Json(null);
         }
 
-        public IActionResult Schedule(int id)
-        {
-            Timetable timetable = db.Timetables.Include(t => t.Appointments).FirstOrDefault(t => t.Id == id);
-            return View(timetable);
-        }
-
         public IActionResult AddUser(int id, DateTime startAt)
         {
             Timetable timetable = db.Timetables.Find(id);
@@ -118,7 +112,7 @@ namespace Cua.Controllers
             db.Appointments.Update(appointment);
             db.SaveChanges();
 
-            return Json(new { redirectUrl = Url.Action("Activities", "Room", new { id = timetable.RoomId }) });
+            return Json("OK");
         }
 
         public async Task<IActionResult> RemoveUser(int id, int? appointmentId)
@@ -184,7 +178,6 @@ namespace Cua.Controllers
             if (!_authorizer.IsTimetableCreator(HttpContext, model.TimetableId))
                 return Json(new { redirectUrl = Url.Action("Warning", "Home", new { message = "You are not creator of this timetable" }) });
 
-            Console.Write(" " + model.NewEndDate);
             Timetable timetable = db.Timetables.Find(model.TimetableId);
             DateTime dayStart = model.NewEndDate == "" ? timetable.StartDate : timetable.EndDate, dayEnd = dayStart;
             DateTime endDate = model.NewEndDate == "" ? timetable.EndDate : DateTime.ParseExact(model.NewEndDate, "dd-MM-yyyy", CultureInfo.InvariantCulture);

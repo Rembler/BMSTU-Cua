@@ -21,6 +21,33 @@
     </div>
 </div>
 
+<div class="modal fade" id="appointmentModal" tabindex="-1" role="dialog" aria-labelledby="appointmentModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <p id="got-id-alternative" hidden></p>
+        <div class="modal-content separate-div modal-div">
+            <div class="modal-header my-appointment-modal-header">
+                <p id="start-date" hidden></p>
+                <p id="end-date" hidden></p>
+                <div class="row">
+                    <div class="my-input-holder col">
+                        <input type="text" id="datepicker" class="my-input" placeholder="Pick a date" readonly/>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body my-appointment-modal-header">
+                <div class="row">
+                    <div class="col my-input-holder">
+                        <select id="available-time" class="my-input"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="make-an-appointment" type="button" class="btn btn-primary yn-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container my-container">
     <div class="row">
         <div class="aling-self-start col-3 criteria-div">
@@ -126,29 +153,29 @@
                     {
                         <div class="col-7 content-div">
                             <p class="own-appointment">Your appointment: @item.Appointments.FirstOrDefault(a => a.UserId == Model.CurrentUser.Id).StartAt.ToString("dd.MM.yyyy HH:mm")</p>
-                            <p class="available-appoinments" style="display: none;">Number of available appointments: @{ int i = item.Appointments.Where(a => a.IsAvailable).Count() + 1; } @i</p>
+                            <p class="available-appointments" style="display: none;">Number of available appointments: @{ int i = item.Appointments.Where(a => a.IsAvailable).Count() + 1; } @i</p>
                         </div>
                         <div class="col join-btn-holder">
                             <button class="btn btn-danger join-room-btn cancel-appointment">Cancel an appointment</button>
-                            <a asp-action="Schedule" asp-controller="Timetable" asp-route-id=@item.Id>
-                                <button class="btn btn-primary join-room-btn make-appointment" style="display: none;">Make an appointment</button>
-                            </a>
+                            <button class="btn btn-primary join-room-btn show-appointment-modal" data-toggle="modal" data-target="#appointmentModal" style="display: none;" >Make an appointment</button>
                         </div>
                     }
                     else
                     {
-                        <div class="col-7 content-div"><p>Number of available appointments: @item.Appointments.Where(a => a.IsAvailable).Count()</p></div>
+                        <div class="col-7 content-div">
+                            <p class="available-appointments">Number of available appointments: @item.Appointments.Where(a => a.IsAvailable).Count()</p>
+                            <p class="own-appointment" style="display: none;"></p>
+                        </div>
                         <div class="col join-btn-holder">
-                            <a asp-action="Schedule" asp-controller="Timetable" asp-route-id=@item.Id>
-                                @if (item.CreatorId == Model.CurrentUser.Id)
-                                {
-                                    <button class="btn btn-primary join-room-btn" disabled>Make an appointment</button>
-                                }
-                                else
-                                {
-                                    <button class="btn btn-primary join-room-btn">Make an appointment</button>
-                                }
-                            </a>
+                            @if (item.CreatorId == Model.CurrentUser.Id)
+                            {
+                                <button class="btn btn-primary join-room-btn" disabled>Make an appointment</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-primary join-room-btn show-appointment-modal" data-toggle="modal" data-target="#appointmentModal">Make an appointment</button>
+                                <button class="btn btn-danger join-room-btn cancel-appointment" style="display: none;">Cancel an appointment</button>
+                            }
                         </div>
                     }
                 </div>
@@ -157,3 +184,5 @@
         </div>
     </div>
 </div>
+
+<script src="~/js/date.js" asp-append-version="true"></script>

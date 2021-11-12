@@ -1,58 +1,57 @@
 $(document).ready(function(){
 
-    var url = window.location.href;
-    var timetableId = url.substring(url.lastIndexOf('/') + 1);
+    var timetableId;
+    var clickedItem;
 
-    var dates;
+    $(".show-appointment-modal").click(function() {
 
-    function toDate(dateStr) {
-        var parts = dateStr.split("-")
-        return new Date(parts[2], parts[1] - 1, parts[0])
-    }
+        clickedItem = $(this).closest(".room-for-join-div");
+        timetableId = clickedItem.find(".hidden-p").text();
 
-    function disableDates(date) {
-        var string = $.datepicker.formatDate('dd-mm-yy', date);
-        return [dates.indexOf(string) != -1];
-    }
+        var dates;
 
-    $.post("/Timetable/GetAvailableDates", { id: timetableId })
-        .done(function(data) {
-
-            if (data == null) {
-                console.log("Status: FAIL");
-            } else {
-                dates = data;
-            }
-        })
-
-    $("#datepicker").datepicker({
-        
-        dateFormat: "dd-mm-yy",
-        minDate: toDate($("#start-date").text()),
-        maxDate: toDate($("#end-date").text()),
-        beforeShowDay: disableDates,
-
-        onSelect: function() {
-
-            var list = $("#available-time").empty();
-            var date = moment($(this).datepicker('getDate')).format("DD-MM-YYYY HH:mm");
-            $("#make-an-appointment").prop('disabled', false);
-
-            $.post("/Timetable/GetAvailableTime", { id: timetableId, date: date })
-                .done(function(data) {
-
-                    if (data == null) {
-                        console.log("Status: FAIL");
-                    } else {
-                        data.sort().forEach(item => {
-                            
-                            var option = $("<option></option>").text(item);
-                            list.append(option);
-                        });
-                    }
-                })
+        function disableDates(date) {
+            var string = $.datepicker.formatDate('dd-mm-yy', date);
+            return [dates.indexOf(string) != -1];
         }
-    });
+
+        $.post("/Timetable/GetAvailableDates", { id: timetableId })
+            .done(function(data) {
+
+                if (data == null) {
+                    console.log("Status: FAIL");
+                } else {
+                    dates = data;
+                }
+            })
+
+        $("#datepicker").datepicker({
+            
+            dateFormat: "dd-mm-yy",
+            beforeShowDay: disableDates,
+
+            onSelect: function() {
+
+                var list = $("#available-time").empty();
+                var date = moment($(this).datepicker('getDate')).format("DD-MM-YYYY HH:mm");
+                $("#make-an-appointment").prop('disabled', false);
+
+                $.post("/Timetable/GetAvailableTime", { id: timetableId, date: date })
+                    .done(function(data) {
+
+                        if (data == null) {
+                            console.log("Status: FAIL");
+                        } else {
+                            data.sort().forEach(item => {
+                                
+                                var option = $("<option></option>").text(item);
+                                list.append(option);
+                            });
+                        }
+                    })
+            }
+        });
+    })
 
     $("#make-an-appointment").click(function() {
 
@@ -66,9 +65,15 @@ $(document).ready(function(){
             .format("DD-MM-YYYY HH:mm");
 
         $.post("/Timetable/AddUser", { id: timetableId, startAt: date })
-            .done(function(data) {
+            .done(function() {
                 
-                window.location.replace(data.redirectUrl);
+                $("#appointmentModal").modal("toggle");
+
+                clickedItem.find(".show-appointment-modal").hide();
+                clickedItem.find(".cancel-appointment").show();
+
+                clickedItem.find(".available-appointments").hide();
+                clickedItem.find(".own-appointment").text("Your appointment: " + date).show();
             });
     });
 });

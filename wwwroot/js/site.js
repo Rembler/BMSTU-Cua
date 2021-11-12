@@ -5,14 +5,6 @@
 
 //  кнопка на странице доступных комнат - перекидывает айди комнаты из скрытого текста на карточке
 //  в скрытый текст на модальном окне
-// $(".join-room-btn").click(function() {
-
-//     var room = $(this).closest(".room-for-join-div");
-//     var roomId = room.find(".hidden-p").text();
-//     console.log(roomId);
-//     $("#got-id").text(roomId);
-//     $("#got-id-for-request").text(roomId);
-// });
 
 $("#items-holder").on("click", ".id-giver", function() {
 
@@ -20,7 +12,7 @@ $("#items-holder").on("click", ".id-giver", function() {
     var itemId = item.find(".hidden-p").text();
     console.log(itemId);
     $("#got-id").text(itemId);
-    $("#got-id-for-request").text(itemId);
+    $("#got-id-alternative").text(itemId);
 });
 
 //  кнопка добавить комнату - отправляет пост запрос на сервер который устанавливает связь между 
@@ -46,7 +38,7 @@ $("#addRoom").click(function() {
 //  отправляет пост запрос на сервер который создает или обновляет запись в таблице запросов
 $("#sendRequest").click(function() {
 
-    var roomId = $("#got-id-for-request").text();
+    var roomId = $("#got-id-alternative").text();
     var comment = $("#comment-input").val();
     $.post("/Room/AddRequest", { id: roomId, comment: comment })
         .done(function(data) {
@@ -395,8 +387,10 @@ $(".change-active-status").click(function() {
 
                 if (clickedBtn.text() == "Start") {
                     clickedBtn.text("Stop");
+                    clickedBtn.removeClass("btn-primary").addClass("btn-danger");
                 } else {
                     clickedBtn.text("Start");
+                    clickedBtn.removeClass("btn-danger").addClass("btn-primary");
                 }
             }
         })
@@ -486,7 +480,7 @@ $(".delete-room-user").click(function() {
     var url = window.location.href;
     var roomId = url.substring(url.lastIndexOf('/') + 1);
 
-    $.post("/Room/DeleteUser", { id: roomId, userId: userId })
+    $.post("/Room/RemoveUser", { id: roomId, userId: userId })
         .done(function(data) {
 
             if (data == null) {
@@ -581,8 +575,8 @@ $(".queue-control").click(function() {
                     var infoDiv = $("<div></div>").addClass("content-div my-queue-member-holder");
                     var infoP = $("<p></p>").text("No users are in queue");
 
-                    infoDiv.append(infoP);
-                    target.append(infoDiv);
+                    // infoDiv.append(infoP);
+                    target.append(infoDiv.append(infoP));
                     $("#remove-first-user").prop("disabled", true);
                 } else {
                     data.sort((a, b) => (a.place > b.place ? 1 : -1));
@@ -591,9 +585,9 @@ $(".queue-control").click(function() {
                         var infoP = $("<p></p>").text(element.name);
                         var hiddenP = $("<p></p>").addClass("queue-user-id").text(element.userId).hide();
 
-                        infoDiv.append(infoP);
-                        infoDiv.append(hiddenP);
-                        target.append(infoDiv);
+                        // infoDiv.append(infoP);
+                        // infoDiv.append(hiddenP);
+                        target.append(infoDiv.append([infoP, hiddenP]));
                     });
                 }
             }
@@ -925,9 +919,9 @@ $(".cancel-appointment").click(function() {
                 console.log("Status: " + data);
 
                 row.find(".cancel-appointment").hide();
-                row.find(".make-appointment").show();
+                row.find(".show-appointment-modal").show();
                 row.find(".own-appointment").hide();
-                row.find(".available-appoinments").show();
+                row.find(".available-appointments").show();
             }
         })
 });

@@ -116,3 +116,11 @@ p.my-msg-body {
 .my-control-input-holder-without-padding {
     padding: 0;
 }
+
+.my-appointment-modal-header {
+    display: block;
+}
+
+option {
+    color: black;
+}

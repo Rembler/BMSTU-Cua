@@ -229,7 +229,7 @@ namespace Cua.Controllers
             return Json(null);
         }
 
-        public async Task<IActionResult> DeleteUser(int id, int userId)
+        public async Task<IActionResult> RemoveUser(int id, int userId)
         {
             if (!_authorizer.IsAdmin(HttpContext, id))
                 return RedirectToAction("Warning", "Home", new { message = "You are not the admin of this room"});
@@ -242,6 +242,13 @@ namespace Cua.Controllers
                 RoomUser removedRoomUser = await db.RoomUsers.FirstOrDefaultAsync(ru => ru.User == user && ru.Room == room);
                 if (removedRoomUser != null)
                 {
+                    List<Appointment> freedAppointments = await  db.Appointments.Where(a => a.UserId == removedRoomUser.UserId).ToListAsync();
+                    foreach (var item in freedAppointments)
+                    {
+                        item.User = null;
+                        item.IsAvailable = true;
+                    }
+                    db.Appointments.UpdateRange(freedAppointments);
                     db.RoomUsers.Remove(removedRoomUser);
                     await db.SaveChangesAsync();
                     return Json("OK");

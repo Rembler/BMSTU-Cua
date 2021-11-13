@@ -979,11 +979,11 @@ $(".save-timetable-changes").click(function() {
 $(".delete-appointment-user").click(function() {
 
     var clickedUser = $(this).closest(".my-participant-div");
-    var appointmentId = clickedUser.find(".user-id").text();
+    var userId = clickedUser.find(".user-id").text();
     var url = window.location.href;
     var timetableId = url.substring(url.lastIndexOf('/') + 1);
 
-    $.post("/Timetable/RemoveUser", { id: timetableId, appointmentId: appointmentId })
+    $.post("/Timetable/RemoveUser", { id: timetableId, userId: userId })
         .done(function(data) {
 
             if (data == null) {

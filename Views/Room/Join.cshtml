@@ -2,7 +2,7 @@
     ViewData["Title"] = "Join room";
 }
 
-@model IEnumerable<Room>
+@model Cua.ViewModels.JoinRoomModel
 
 <div class="modal fade" id="roomJoinModal" tabindex="-1" role="dialog" aria-labelledby="roomJoinTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -53,8 +53,7 @@
         </div>
     </div>
     <div id="items-holder" class="flex-fill ml-5">
-    @{ List<Request> requests = ViewBag.Requests; }
-    @foreach (var item in Model)
+    @foreach (var item in Model.Rooms)
     {
         @if (!item.Hidden)
         {
@@ -98,20 +97,12 @@
                     {
                         @Html.Raw("</div>");
                     }
-                    @* <div class="row">
-                        <div class="col content-div"><p>Что-то</p></div>
-                        <div class="col content-div"><p>Кто-то</p></div>
-                    </div>
-                    <div class="row">
-                        <div class="col content-div"><p>Что-то</p></div>
-                        <div class="col content-div"><p>Кто-то</p></div>
-                    </div> *@
                     <div class="row">
                         <div class="col content-div company-name"><p>Organization: @item.Company</p></div>
                         <div class="col content-div"><p>Number of participants: @item.RoomUsers.Count()</p></div>
                         @if (item.Private)
                         {
-                            if (requests.Any(r => r.Room == item && r.Checked == false))
+                            if (Model.Requests.Any(r => r.Room == item && r.Checked == false))
                             {
                                 <div class="col join-btn-holder"><button class="btn btn-primary join-room-btn id-giver" data-toggle="modal" data-target="#privateRoomJoinModal" disabled>Join</button></div>
                             }

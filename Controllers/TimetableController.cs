@@ -15,13 +15,17 @@ namespace Cua.Controllers
     [Authorize]
     public class TimetableController : Controller
     {
-        private ApplicationContext db;
         private readonly AuthorizationService _authorizer;
+        private readonly ActivityHelperService _timetabledb;
+        private readonly SharedHelperService _shareddb;
         
-        public TimetableController(ApplicationContext context, AuthorizationService authorizationService)
+        public TimetableController(AuthorizationService authorizationService,
+            ActivityHelperService activityHelperService,
+            SharedHelperService sharedHelperService)
         {
-            db = context;
             _authorizer = authorizationService;
+            _timetabledb = activityHelperService;
+            _shareddb = sharedHelperService;
         }
 
         [HttpGet]
@@ -44,18 +48,8 @@ namespace Cua.Controllers
             if (ModelState.IsValid)
             {
                 User creator = await _authorizer.GetCurrentUserAsync(HttpContext);
-                Room room = await db.Rooms.FindAsync(model.RoomId);
-                Timetable newTimetable = new Timetable() {
-                    Name = model.Name,
-                    Room = room,
-                    Creator = creator,
-                    StartDate = model.StartDate,
-                    EndDate = model.EndDate,
-                    AppointmentDuration = model.AppointmentDuration ?? default(int),
-                    BreakDuration = model.BreakDuration ?? default(int)
-                };
-                db.Timetables.Add(newTimetable);
-                await db.SaveChangesAsync();
+                Room room = await _shareddb.GetRoomAsync(model.RoomId);
+                Timetable newTimetable = await _timetabledb.CreateTimetableAsync(model, creator, room);
                 return RedirectToAction("AppointmentSettings", "Timetable", new { id = newTimetable.Id, newEndDate = "" });
             }
             return View(model);
@@ -66,16 +60,10 @@ namespace Cua.Controllers
             if (!_authorizer.IsTimetableCreator(HttpContext, id))
                 return RedirectToAction("Warning", "Home", new { message = "You are not creator of this timetable"});
 
-            Timetable removedTimetable = await db.Timetables.FindAsync(id);
-
-            if (removedTimetable != null)
-            {
-                db.Timetables.Remove(removedTimetable);
-                await db.SaveChangesAsync();
+            if(await _timetabledb.DeleteTimetableAsync(id))
                 return Json("OK");
-            }
-            Console.Write("Can't find timetable with ID = " + id);
-            return Json(null);
+            else
+                return Json(null);
         }
 
         public async Task<IActionResult> Update(int id, string newName)
@@ -83,62 +71,46 @@ namespace Cua.Controllers
             if (!_authorizer.IsTimetableCreator(HttpContext, id))
                 return RedirectToAction("Warning", "Home", new { message = "You are not creator of this timetable"});
 
-            Timetable updatedTimetable = await db.Timetables.FindAsync(id);
-
-            if (updatedTimetable != null)
-            {
-                updatedTimetable.Name = newName;
-
-                db.Timetables.Update(updatedTimetable);
-                await db.SaveChangesAsync();
-
+            if (await _timetabledb.UpdateTimetableAsync(id, newName))
                 return Json("OK");
-            }
-            return Json(null);
+            else
+                return Json(null);
         }
 
-        public IActionResult AddUser(int id, DateTime startAt)
+        public async Task<IActionResult> AddUser(int id, DateTime startAt)
         {
-            Timetable timetable = db.Timetables.Find(id);
+            Timetable timetable = await _timetabledb.GetTimetableAsync(id);
 
             if (!_authorizer.IsMember(HttpContext, timetable.RoomId))
                 return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
 
-            Appointment appointment = db.Appointments.FirstOrDefault(a => a.TimetableId == timetable.Id && a.StartAt == startAt);
             User user = _authorizer.GetCurrentUser(HttpContext);
-
-            appointment.User = user;
-            appointment.IsAvailable = false;
-            db.Appointments.Update(appointment);
-            db.SaveChanges();
-
+            await _timetabledb.AddUserToTimetableAsync(user, timetable.Id, startAt);
             return Json("OK");
         }
 
-        public async Task<IActionResult> RemoveUser(int id, int? appointmentId)
+        public async Task<IActionResult> RemoveUser(int id, int? userId)
         {
-            Timetable timetable = await db.Timetables.FindAsync(id);
+            Timetable timetable = await _timetabledb.GetTimetableAsync(id);
+            User user;
 
-            if (!_authorizer.IsMember(HttpContext, timetable.RoomId))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
-
-            Appointment appointment;
-            if (appointmentId == null)
+            if (userId == null)
             {
-                User user = await _authorizer.GetCurrentUserAsync(HttpContext);
-                appointment = await db.Appointments.FirstOrDefaultAsync(a => a.TimetableId == timetable.Id && a.UserId == user.Id);
+                if (!_authorizer.IsMember(HttpContext, timetable.RoomId))
+                    return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+                user = await _authorizer.GetCurrentUserAsync(HttpContext);
             }
             else
             {
-                appointment = await db.Appointments.Include(a => a.User).FirstOrDefaultAsync(a => a.Id == appointmentId);
+                if (!_authorizer.IsTimetableCreator(HttpContext, timetable.Id))
+                    return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+                user = await _shareddb.GetUserByIdAsync((int)userId);
             }
 
-            appointment.User = null;
-            appointment.IsAvailable = true;
-            db.Appointments.Update(appointment);
-            await db.SaveChangesAsync();
-
-            return Json("OK");
+            if(await _shareddb.RemoveUserFromTimetableAsync(user, timetable))
+                return Json("OK");
+            else
+                return Json(null);
         }
 
         public async Task<IActionResult> Settings(int id)
@@ -146,18 +118,14 @@ namespace Cua.Controllers
             if (!_authorizer.IsTimetableCreator(HttpContext, id))
                 return RedirectToAction("Warning", "Home", new { message = "You are not creator of this timetable"});
 
-            Timetable timetable = await db.Timetables
-                .Include(t => t.Appointments)
-                .ThenInclude(a => a.User)
-                .FirstOrDefaultAsync(t => t.Id == id);
-                
+            Timetable timetable = await _timetabledb.GetTimetableAsync(id);   
             return View(timetable);
         }
 
         [HttpGet]
-        public IActionResult AppointmentSettings(int id, string newEndDate)
+        public async Task<IActionResult> AppointmentSettings(int id, string newEndDate)
         {
-            Timetable timetable = db.Timetables.Find(id);
+            Timetable timetable = await _timetabledb.GetTimetableAsync(id);
             int step = timetable.AppointmentDuration + timetable.BreakDuration;
             DateTime startTime = DateTime.Parse("00:00");
             DateTime endTime = DateTime.Parse("23:59");
@@ -173,12 +141,12 @@ namespace Cua.Controllers
         }
 
         [HttpPost]
-        public IActionResult AppointmentSettings([FromBody] AppointmentSettingsModel model)
+        public async Task<IActionResult> AppointmentSettings([FromBody] AppointmentSettingsModel model)
         {
             if (!_authorizer.IsTimetableCreator(HttpContext, model.TimetableId))
                 return Json(new { redirectUrl = Url.Action("Warning", "Home", new { message = "You are not creator of this timetable" }) });
 
-            Timetable timetable = db.Timetables.Find(model.TimetableId);
+            Timetable timetable = await _timetabledb.GetTimetableAsync(model.TimetableId);
             DateTime dayStart = model.NewEndDate == "" ? timetable.StartDate : timetable.EndDate, dayEnd = dayStart;
             DateTime endDate = model.NewEndDate == "" ? timetable.EndDate : DateTime.ParseExact(model.NewEndDate, "dd-MM-yyyy", CultureInfo.InvariantCulture);
             int step = timetable.AppointmentDuration + timetable.BreakDuration;
@@ -195,53 +163,25 @@ namespace Cua.Controllers
                 {  
                     startAt = endAt;
                     endAt = item;
-                    
                     if (model.Days.FirstOrDefault(d => d.WeekDay == weekDay).Appointments[index] == 1)
-                    {
-                        Appointment newAppointment = new Appointment() {
-                            StartAt = startAt,
-                            EndAt = endAt,
-                            Timetable = timetable,
-                            IsAvailable = true
-                        };
-                        db.Appointments.Add(newAppointment);
-                    }
-
+                        await _timetabledb.AddAppointmentToTimetableAsync(timetable, startAt, endAt);
                     index++;
                 }
             }
 
             if (model.NewEndDate != "")
-            {
-                timetable.EndDate = endDate;
-                db.Timetables.Update(timetable);
-            }
-
-            db.SaveChanges();
+                await _timetabledb.UpdateTimetableEndDateAsync(timetable, endDate);
             return Json(new { redirectUrl = Url.Action("Control", "Room", new { id = timetable.RoomId }) });
         }
 
-        public JsonResult GetAvailableDates(int id)
+        public async Task<JsonResult> GetAvailableDates(int id)
         {
-            List<string> availableDates = db.Appointments
-                .Where(a => a.TimetableId == id && a.IsAvailable)
-                .Select(a => a.StartAt.ToString("dd-MM-yyyy"))
-                .Distinct()
-                .ToList();
-            return Json(availableDates);
+            return Json(await _timetabledb.GetTimetableAvailableDatesAsync(id));
         }
 
-        public JsonResult GetAvailableTime(int id, DateTime date)
+        public async Task<JsonResult> GetAvailableTime(int id, DateTime date)
         {
-            List<string> availableTime = db.Appointments
-                .Where(a => a.TimetableId == id 
-                    && a.StartAt.Date == date.Date 
-                    && a.IsAvailable)
-                .Select(a => a.StartAt.ToString("HH:mm")
-                    + " - "
-                    + a.StartAt.AddMinutes(a.Timetable.AppointmentDuration).ToString("HH:mm"))
-                .ToList();
-            return Json(availableTime);
+            return Json(await _timetabledb.GetTimetableAvailableTimeAsync(id, date));
         }
 
         private IEnumerable<DateTime> EachAppointment(DateTime startTime, DateTime endTime, int step) {  

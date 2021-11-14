@@ -13,6 +13,9 @@ namespace Cua.Models
         public DbSet<Message> Messages { get; set ;}
         public DbSet<Timetable> Timetables { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<HubUser> HubUsers { get; set; }
+        public DbSet<HubGroup> HubGroups { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

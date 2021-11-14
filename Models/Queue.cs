@@ -10,6 +10,7 @@ namespace Cua.Models
         public int Limit { get; set; }
         public DateTime StartAt { get; set; }
         public bool Active { get; set; }
+        public int NotificationCount { get; set; }
         public int CreatorId { get; set; }
         public User Creator { get; set; }
         public int RoomId { get; set; }

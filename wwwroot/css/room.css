@@ -124,3 +124,7 @@ p.my-msg-body {
 option {
     color: black;
 }
+
+.my-notification:hover {
+    cursor: pointer;
+}

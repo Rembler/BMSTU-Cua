@@ -20,6 +20,7 @@ namespace Cua.Models
         public ICollection<QueueUser> QueueUsers { get; set; }
         public ICollection<Request> Requests { get; set; }
         public ICollection<Appointment> Appointments { get; set; }
+        public ICollection<Notification> Notifications { get; set; }
         public User()
         {
             CreatedQueues = new List<Queue>();
@@ -29,6 +30,7 @@ namespace Cua.Models
             QueueUsers = new List<QueueUser>();
             Requests = new List<Request>();
             Appointments = new List<Appointment>();
+            Notifications = new List<Notification>();
         }
     }
 }

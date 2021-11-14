@@ -155,6 +155,8 @@ $("#addQueue").click(function() {
                     return parseInt(oldVal, 10) + 1;
                 });
 
+                // connection.invoke("JoinGroup", "queue-" + queueId);
+
                 queueDiv.find(".join-queue-btn").hide();
                 queueDiv.find(".leave-queue-btn").show();
             }
@@ -180,6 +182,8 @@ $(".leave-queue-btn").click(function() {
             toDec.text(function(i, oldVal) {
                 return parseInt(oldVal, 10) - 1;
             });
+
+            // connection.invoke("LeaveGroup", "queue-" + queueId);
 
             queueDiv.find(".join-queue-btn").show();
             queueDiv.find(".leave-queue-btn").hide();
@@ -992,6 +996,45 @@ $(".delete-appointment-user").click(function() {
                 console.log("Status: " + data);
 
                 clickedUser.remove();
+            }
+        })
+});
+
+$(document).ready(function() {
+
+    var target = $("#notifications-holder");
+
+    $.post("/Account/GetNotifications")
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: OK");
+
+                data.forEach(element => {
+                    var notification = $("<div></div>").addClass("content-div my-queue-member-holder my-notification notification");
+                    var text = $("<p></p>").text(element.body);
+                    var id = $("<p></p>").addClass("notification-id").text(element.id).hide();
+                    target.append(notification.append([text, id]));
+                });
+            }
+        })
+});
+
+$("#notifications-holder").on("click", ".notification", function() {
+
+    var toRemove = $(this);
+    var notificationId = $(this).find(".notification-id").text();
+
+    $.post("/Account/HideNotification", { id: notificationId })
+        .done(function(data) {
+
+            if (data == null) {
+                console.log("Status: FAIL");
+            } else {
+                console.log("Status: " + data);
+                toRemove.remove();
             }
         })
 });

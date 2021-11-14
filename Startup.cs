@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,6 +41,8 @@ namespace Cua
 
             services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
 
+            services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+
             services.AddTransient<MailService>();
             services.AddTransient<AuthorizationService>();
             services.AddTransient<UserHelperService>();
@@ -49,6 +52,8 @@ namespace Cua
                 
             services.AddControllersWithViews();
             services.AddSignalR();
+
+            services.AddHostedService<MyTestHostedService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

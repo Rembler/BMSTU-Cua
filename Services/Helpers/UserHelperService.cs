@@ -50,6 +50,10 @@ namespace Cua.Services
             List<Room> removedRooms = db.Rooms.Where(r => r.Admin == user).ToList();
             db.Rooms.RemoveRange(removedRooms);
             db.Users.Remove(user);
+
+            HubUser hubUser = await db.HubUsers.FindAsync(user.Email);
+            db.HubUsers.Remove(hubUser);
+
             await db.SaveChangesAsync();
         }
 

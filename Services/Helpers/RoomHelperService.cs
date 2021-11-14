@@ -26,6 +26,13 @@ namespace Cua.Services
                 Hidden = model.Hidden, Admin = user };
             db.Rooms.Add(newRoom);
             await db.SaveChangesAsync();
+
+            HubGroup hubGroup = new HubGroup() { Name = "room-" + newRoom.Id, HubUsers = new List<HubUser>() };
+            db.HubGroups.Add(hubGroup);
+            HubUser hubUser = db.HubUsers.Find(user.Email);
+            hubGroup.HubUsers.Add(hubUser);
+
+            await db.SaveChangesAsync();
         }
 
         public async Task<bool> DeleteRoomAsync(int id)
@@ -34,6 +41,10 @@ namespace Cua.Services
             if (removedRoom != null)
             {
                 db.Rooms.Remove(removedRoom);
+
+                HubGroup hubGroup = await db.HubGroups.FindAsync("room-" + id);
+                db.HubGroups.Remove(hubGroup);
+
                 await db.SaveChangesAsync();
                 return true;
             }
@@ -101,6 +112,11 @@ namespace Cua.Services
                 IsModerator = false
             };
             db.RoomUsers.Add(newRoomUser);
+
+            HubGroup hubGroup = await db.HubGroups.Include(hg => hg.HubUsers).FirstOrDefaultAsync(hg => hg.Name == "room-" + room.Id);
+            HubUser hubUser = await db.HubUsers.FindAsync(user.Email);
+            hubGroup.HubUsers.Add(hubUser);
+
             await db.SaveChangesAsync();
         }
 
@@ -141,6 +157,11 @@ namespace Cua.Services
                     await shared.RemoveUserFromQueueAsync(user, item);
                 
                 db.RoomUsers.Remove(removedRoomUser);
+
+                HubGroup hubGroup = await db.HubGroups.Include(hg => hg.HubUsers).FirstOrDefaultAsync(hg => hg.Name == "room-" + room.Id);
+                HubUser hubUser = await db.HubUsers.FindAsync(user.Email);
+                hubGroup.HubUsers.Remove(hubUser);
+
                 await db.SaveChangesAsync();
                 return true;
             }

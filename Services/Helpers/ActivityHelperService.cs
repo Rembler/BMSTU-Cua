@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cua.Hubs;
 using Cua.Models;
 using Cua.ViewModels;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cua.Services
@@ -11,10 +13,12 @@ namespace Cua.Services
     public class ActivityHelperService
     {
         private ApplicationContext db;
+        private readonly IHubContext<ChatHub> _hub;
 
-        public ActivityHelperService(ApplicationContext context)
+        public ActivityHelperService(ApplicationContext context, IHubContext<ChatHub> hubContext)
         {
             db = context;
+            _hub = hubContext;
         }
 
         public async Task CreateQueueAsync(User user, CreateQueueModel model)
@@ -26,9 +30,17 @@ namespace Cua.Services
                 StartAt = model.StartAt, 
                 Room = room,
                 Creator = user,
-                Active = false
+                Active = false,
+                NotificationCount = 0
             };
             db.Queues.Add(queue);
+            await db.SaveChangesAsync();
+
+            HubGroup hubGroup = new HubGroup() { Name = "queue-" + queue.Id, HubUsers = new List<HubUser>() };
+            db.HubGroups.Add(hubGroup);
+            HubUser hubUser = await db.HubUsers.FindAsync(user.Email);
+            hubGroup.HubUsers.Add(hubUser);
+
             await db.SaveChangesAsync();
         }
 
@@ -53,6 +65,10 @@ namespace Cua.Services
                 List<QueueUser> removedQueueUsers = await GetQueueUsersAsync(id);
                 db.QueueUsers.RemoveRange(removedQueueUsers);
                 db.Queues.Remove(removedQueue);
+
+                HubGroup hubGroup = await db.HubGroups.FindAsync("queue-" + id);
+                db.HubGroups.Remove(hubGroup);
+
                 await db.SaveChangesAsync();                
                 return true;
             }
@@ -66,6 +82,8 @@ namespace Cua.Services
             {
                 updatedQueue.Name = name;
                 updatedQueue.Limit = limit > 0 ? limit : 0;
+                if (updatedQueue.StartAt != startAt)
+                    updatedQueue.NotificationCount = 0;
                 updatedQueue.StartAt = startAt;
 
                 db.Queues.Update(updatedQueue);
@@ -89,6 +107,11 @@ namespace Cua.Services
                     {
                         QueueUser queueUser = new QueueUser() { User = user, Queue = queue, Place = place };
                         db.QueueUsers.Update(queueUser);
+
+                        HubGroup hubGroup = await db.HubGroups.Include(hg => hg.HubUsers).FirstOrDefaultAsync(hg => hg.Name == "queue-" + queueId);
+                        HubUser hubUser = await db.HubUsers.FindAsync(user.Email);
+                        hubGroup.HubUsers.Add(hubUser);
+
                         await db.SaveChangesAsync();
                         return true;
                     }
@@ -174,7 +197,8 @@ namespace Cua.Services
                 StartAt = startAt,
                 EndAt = endAt,
                 Timetable = timetable,
-                IsAvailable = true
+                IsAvailable = true,
+                NotificationCount = 0
             };
             db.Appointments.Add(newAppointment);
             await db.SaveChangesAsync();

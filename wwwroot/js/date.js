@@ -74,6 +74,8 @@ $(document).ready(function(){
 
                 clickedItem.find(".available-appointments").hide();
                 clickedItem.find(".own-appointment").text("Your appointment: " + date).show();
+
+                // connection.invoke("JoinGroup", "");
             });
     });
 });

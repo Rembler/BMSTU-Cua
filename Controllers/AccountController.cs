@@ -281,6 +281,18 @@ namespace Cua.Controllers
             else
                 return View("Error");
         }
+
+        public async Task<JsonResult> GetNotifications()
+        {
+            User user = await _authorizer.GetCurrentUserAsync(HttpContext);
+            return Json(await _shareddb.GetNotificationsAsync(user));
+        }
+
+        public async Task<JsonResult> HideNotification(int id)
+        {
+            await _shareddb.UpdateNotificationAsync(id);
+            return Json("OK");
+        }
  
         public async Task<IActionResult> Logout()
         {

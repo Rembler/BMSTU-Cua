@@ -32,7 +32,7 @@ namespace Cua.Controllers
         public IActionResult Create(int roomId)
         {
             if (!_authorizer.IsModerator(HttpContext, roomId))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не админинстратор и не модератор этой комнаты"});
 
             CreateTimetableModel model = new CreateTimetableModel() { RoomId = roomId };
             return View(model);
@@ -43,7 +43,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Create(CreateTimetableModel model)
         {
             if (!_authorizer.IsModerator(HttpContext, model.RoomId))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не админинстратор и не модератор этой комнаты"});
 
             if (ModelState.IsValid)
             {
@@ -58,7 +58,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             if (!_authorizer.IsTimetableCreator(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not creator of this timetable"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не создатель этого расписания"});
 
             if(await _timetabledb.DeleteTimetableAsync(id))
                 return Json("OK");
@@ -69,7 +69,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Update(int id, string newName)
         {
             if (!_authorizer.IsTimetableCreator(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not creator of this timetable"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не создатель этого расписания"});
 
             if (await _timetabledb.UpdateTimetableAsync(id, newName))
                 return Json("OK");
@@ -82,7 +82,7 @@ namespace Cua.Controllers
             Timetable timetable = await _timetabledb.GetTimetableAsync(id);
 
             if (!_authorizer.IsMember(HttpContext, timetable.RoomId))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не участник этой комнаты"});
 
             User user = _authorizer.GetCurrentUser(HttpContext);
             await _timetabledb.AddUserToTimetableAsync(user, timetable.Id, startAt);
@@ -97,13 +97,13 @@ namespace Cua.Controllers
             if (userId == null)
             {
                 if (!_authorizer.IsMember(HttpContext, timetable.RoomId))
-                    return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+                    return RedirectToAction("Warning", "Home", new { message = "Вы не участник этой комнаты"});
                 user = await _authorizer.GetCurrentUserAsync(HttpContext);
             }
             else
             {
                 if (!_authorizer.IsTimetableCreator(HttpContext, timetable.Id))
-                    return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+                    return RedirectToAction("Warning", "Home", new { message = "Вы не участник этой комнаты"});
                 user = await _shareddb.GetUserByIdAsync((int)userId);
             }
 
@@ -116,7 +116,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Settings(int id)
         {
             if (!_authorizer.IsTimetableCreator(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not creator of this timetable"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не создатель этого расписания"});
 
             Timetable timetable = await _timetabledb.GetTimetableAsync(id);   
             return View(timetable);
@@ -144,7 +144,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> AppointmentSettings([FromBody] AppointmentSettingsModel model)
         {
             if (!_authorizer.IsTimetableCreator(HttpContext, model.TimetableId))
-                return Json(new { redirectUrl = Url.Action("Warning", "Home", new { message = "You are not creator of this timetable" }) });
+                return Json(new { redirectUrl = Url.Action("Warning", "Home", new { message = "Вы не создатель этого расписания" }) });
 
             Timetable timetable = await _timetabledb.GetTimetableAsync(model.TimetableId);
             DateTime dayStart = model.NewEndDate == "" ? timetable.StartDate : timetable.EndDate, dayEnd = dayStart;

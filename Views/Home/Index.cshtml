@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Main page";
+    ViewData["Title"] = "Домашняя страница";
 }
 
 @model IEnumerable<Room>
@@ -9,12 +9,12 @@
         <div class="modal-content separate-div modal-div">
             <div class="modal-header">
                 <div class="content-div content-modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Want to create or join a room?</h5>
+                    <h5 class="modal-title" id="exampleModalLongTitle">Хотите создать комнату или присоединиться к существующей?</h5>
                 </div>
             </div>
             <div class="modal-footer">
-                <a asp-controller="Room" asp-action="Create"><button type="button" class="btn btn-primary cj-btn">Create</button></a>
-                <a asp-controller="Room" asp-action="Join"><button type="button" class="btn btn-primary cj-btn">Join</button></a>
+                <a asp-controller="Room" asp-action="Create"><button type="button" class="btn btn-primary cj-btn">Создать</button></a>
+                <a asp-controller="Room" asp-action="Join"><button type="button" class="btn btn-primary cj-btn">Вступить</button></a>
             </div>
         </div>
     </div>
@@ -23,23 +23,23 @@
 <div class="container separate-div menu-div">
     <div class="row">
         <div class="col">
-            <input class="my-input search-input" type="text" placeholder="Find a room..."/>
+            <input class="my-input search-input" type="text" placeholder="Найти комнату..."/>
         </div>
         <div class="col-2">
             <div class="dropdown">
                 <p hidden id="direction">1</p>
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Sort
+                    Сортировать
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a id="created-joined" class="dropdown-item" href="#" onclick="return false;">Created / Joined</a>
+                    <a id="created-joined" class="dropdown-item" href="#" onclick="return false;">Создана / добавлена</a>
                     @* <a id="last-updated" class="dropdown-item" href="#" onclick="return false;">Last updated</a>   *@
-                    <a id="name" class="dropdown-item" href="#" onclick="return false;">Name</a>                                      
+                    <a id="name" class="dropdown-item" href="#" onclick="return false;">По имени</a>                                      
                 </div>
             </div>
         </div>
         <div class="col-2">
-            <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#exampleModalCenter">Add</button>
+            <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#exampleModalCenter">Добавить</button>
         </div>
     </div>
 </div>
@@ -57,19 +57,19 @@
                     <div class="col content-div">
                         @if (item.Admin.Email == ViewBag.CurrentUser)
                         {
-                            <p class="admin-name">Admin: me</p>
+                            <p class="admin-name">Админ: я</p>
                         }
                         else
                         {
-                            <p class="admin-name">Admin: @item.Admin.Name @item.Admin.Surname</p>
+                            <p class="admin-name">Админ: @item.Admin.Name @item.Admin.Surname</p>
                         }
                     </div>
                 </div>
                 <div class="row">
                     <div class="col">
                         <div class="row">
-                            <div class="col content-div"><p>Organization: @item.Company</p></div>
-                            <div class="col content-div"><p>Number of participants: @item.RoomUsers.Count()</p></div>
+                            <div class="col content-div"><p>Органицация: @item.Company</p></div>
+                            <div class="col content-div"><p>Количество участников: @item.RoomUsers.Count()</p></div>
                         </div>
                     </div>
                     <div class="col-2">
@@ -77,21 +77,21 @@
                             <div class="col illustration">
                             @if (item.Private)
                             {
-                                <ion-icon name="lock-closed-outline"></ion-icon>
+                                <span title="Закрытая комната"><ion-icon name="lock-closed-outline"></ion-icon></span>
                             }
                             else
                             {
-                                <ion-icon name="lock-open-outline"></ion-icon>
+                                <span title="Открытая комната"><ion-icon name="lock-open-outline"></ion-icon></span>
                             }
                             </div>
                             <div class="col illustration">
                             @if (item.Hidden)
                             {
-                                <ion-icon name="eye-off-outline"></ion-icon>
+                                <span title="Скрытая комната"><ion-icon name="eye-off-outline"></ion-icon></span>
                             }
                             else
                             {
-                                <ion-icon name="eye-outline"></ion-icon>
+                                <span title="Видимая комната"><ion-icon name="eye-outline"></ion-icon></span>
                             }
                             </div>
                         </div>
@@ -105,7 +105,7 @@
                         @Html.Raw("<div class=\"row\">");
                     }
                     <div class="col content-div room-activity">
-                        <p>Queue "@queue.Name" (Start: @queue.StartAt.ToString("dd.MM.yyyy") at @queue.StartAt.ToString("HH:mm"))</p>
+                        <p>Очередь "@queue.Name" (Начало: @queue.StartAt.ToString("dd.MM.yyyy") в @queue.StartAt.ToString("HH:mm"))</p>
                     </div>
                     if (index % 2 != 0)
                     {
@@ -120,7 +120,7 @@
                         @Html.Raw("<div class=\"row\">");
                     }
                     <div class="col content-div room-activity">
-                        <p>Timetable "@timetable.Name" (From @timetable.StartDate.ToString("dd.MM.yyyy") to @timetable.EndDate.ToString("dd.MM.yyyy"))</p>
+                        <p>Расписание "@timetable.Name" (С @timetable.StartDate.ToString("dd.MM.yyyy") до @timetable.EndDate.ToString("dd.MM.yyyy"))</p>
                     </div>
                     if (index % 2 != 0)
                     {

@@ -31,7 +31,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Create()
         {
             User user = await _authorizer.GetCurrentUserAsync(HttpContext);
-            CreateRoomModel model = new CreateRoomModel() { Company = user.Company, About = "Generic room description" };
+            CreateRoomModel model = new CreateRoomModel() { Company = user.Company, About = "Описание комнаты" };
             return View(model);
         }
         
@@ -51,7 +51,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Delete(int id) 
         {
             if (!_authorizer.IsAdmin(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the admin of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не администратор этой комнаты"});
 
             if (await _roomdb.DeleteRoomAsync(id))
                 return RedirectToAction("Index", "Home");
@@ -65,7 +65,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Update(int id, string newName, string newCompany, string newAbout)
         {
             if (!_authorizer.IsModerator(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не админинстратор и не модератор этой комнаты"});
 
             if (await _roomdb.UpdateRoomAsync(id, newName, newCompany, newAbout))
                 return Json("OK");
@@ -86,7 +86,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Decline(int id, int userId)
         {
             if (!_authorizer.IsModerator(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не админинстратор и не модератор этой комнаты"});
 
             if (await _roomdb.DeclineRoomRequestAsync(userId, id))
                 return Json("OK");
@@ -105,7 +105,7 @@ namespace Cua.Controllers
             if (userId != null)
             {
                 if (!_authorizer.IsModerator(HttpContext, id))
-                    return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+                    return RedirectToAction("Warning", "Home", new { message = "Вы не админинстратор и не модератор этой комнаты"});
 
                 user = await _shareddb.GetUserByIdAsync((int)userId);
             }
@@ -162,7 +162,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> ChangeModeratorStatus(int id, int userId)
         {
             if (!_authorizer.IsAdmin(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the admin of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не администратор этой комнаты"});
 
             User user = await _shareddb.GetUserByIdAsync(userId);
             Room room = await _shareddb.GetRoomAsync(id);
@@ -187,14 +187,14 @@ namespace Cua.Controllers
             if (userId != null)
             {
                 if (!_authorizer.IsAdmin(HttpContext, id))
-                    return RedirectToAction("Warning", "Home", new { message = "You are not the admin of this room"});
+                    return RedirectToAction("Warning", "Home", new { message = "Вы не администратор этой комнаты"});
 
                 user = await _shareddb.GetUserByIdAsync((int)userId);
             }
             else
             {
                 if (!_authorizer.IsMember(HttpContext, id))
-                    return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+                    return RedirectToAction("Warning", "Home", new { message = "Вы не участник этой комнаты"});
 
                 user = await _authorizer.GetCurrentUserAsync(HttpContext);
             }
@@ -223,7 +223,7 @@ namespace Cua.Controllers
             if (userId != null)
             {
                 if (!_authorizer.IsModerator(HttpContext, id))
-                    return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+                    return RedirectToAction("Warning", "Home", new { message = "Вы не админинстратор и не модератор этой комнаты"});
             
                 user = await _shareddb.GetUserByIdAsync((int)userId);
                 fromRoom = true;
@@ -244,7 +244,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Content(int id)
         {
             if (!_authorizer.IsMember(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не участник этой комнаты"});
 
             RoomContentModel model = new RoomContentModel() {
                 CurrentUser = await _authorizer.GetCurrentUserAsync(HttpContext),
@@ -258,7 +258,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Control(int id)
         {
             if (!_authorizer.IsModerator(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не админинстратор и не модератор этой комнаты"});
             
             User user = await _authorizer.GetCurrentUserAsync(HttpContext);
             ControlPanelModel model = await _roomdb.GetControlPanelModelAsync(id, user);       
@@ -268,7 +268,7 @@ namespace Cua.Controllers
         public IActionResult Candidates(int id)
         {
             if (!_authorizer.IsModerator(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не админинстратор и не модератор этой комнаты"});
             
             return View();
         }
@@ -276,7 +276,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Activities(int id)
         {
             if (!_authorizer.IsMember(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не участник этой комнаты"});
 
             User user = await _authorizer.GetCurrentUserAsync(HttpContext);
             ActivitiesModel model = await _roomdb.GetRoomActivitiesAsync(id, user);
@@ -286,7 +286,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> GetAvailableUsers(int id, string searchedName, string searchedCompany)
         {
             if (!_authorizer.IsModerator(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не админинстратор и не модератор этой комнаты"});
 
             if (searchedCompany == null)
                 searchedCompany = "";

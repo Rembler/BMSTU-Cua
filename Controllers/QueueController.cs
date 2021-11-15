@@ -31,7 +31,7 @@ namespace Cua.Controllers
         public IActionResult Create(int roomId)
         {
             if (!_authorizer.IsModerator(HttpContext, roomId))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не админинстратор и не модератор этой комнаты"});
 
             CreateQueueModel model = new CreateQueueModel() { RoomId = roomId };
             return View(model);
@@ -42,7 +42,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Create(CreateQueueModel model)
         {
             if (!_authorizer.IsModerator(HttpContext, model.RoomId))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the admin or moderator of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не админинстратор и не модератор этой комнаты"});
 
             if (ModelState.IsValid)
             {
@@ -56,7 +56,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             if (!_authorizer.IsQueueCreator(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not creator of this queue"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не создатель этой очереди"});
 
             if (await _queuedb.DeleteQueueAsync(id))
                 return Json("OK");
@@ -70,7 +70,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Settings(int id)
         {
             if (!_authorizer.IsQueueCreator(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not creator of this queue"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не создатель этой очереди"});
 
             Queue queue = await _queuedb.GetQueueAsync(id);               
             return View(queue);
@@ -79,7 +79,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> Update(int id, string newName, int newLimit, DateTime newStartAt)
         {
             if (!_authorizer.IsQueueCreator(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not creator of this queue"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не создатель этой очереди"});
 
             if (await _queuedb.UpdateQueueAsync(id, newName, newLimit, newStartAt))
                 return Json("OK");
@@ -90,7 +90,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> AddUser(int id, int roomId)
         {
             if (!_authorizer.IsMember(HttpContext, roomId))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не участник этой комнаты"});
 
             User user = await _authorizer.GetCurrentUserAsync(HttpContext);
             if (await _queuedb.AddUserToQueueAsync(user, id))
@@ -102,7 +102,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> ChangeActiveStatus(int id)
         {
             if (!_authorizer.IsQueueCreator(HttpContext, id))
-                return RedirectToAction("Warning", "Home", new { message = "You are not creator of this queue"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не создатель этой очереди"});
 
             if (await _queuedb.ChangeQueueActiveStatusAsync(id))
                 return Json("OK");
@@ -113,7 +113,7 @@ namespace Cua.Controllers
         public async Task<IActionResult> GetUsers(int id, int roomId)
         {
             if (!_authorizer.IsMember(HttpContext, roomId))
-                return RedirectToAction("Warning", "Home", new { message = "You are not the member of this room"});
+                return RedirectToAction("Warning", "Home", new { message = "Вы не участник этой комнаты"});
 
             Queue queue = await _queuedb.GetQueueAsync(id);
             
@@ -144,7 +144,7 @@ namespace Cua.Controllers
             if (userId != null)
             {
                 if (!_authorizer.IsQueueCreator(HttpContext, id))
-                    return RedirectToAction("Warning", "Home", new { message = "You are not creator of this queue"});
+                    return RedirectToAction("Warning", "Home", new { message = "Вы не создатель этой очереди"});
             }
             else
                 userId = (await _authorizer.GetCurrentUserAsync(HttpContext)).Id;

@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Room control page";
+    ViewData["Title"] = "Панель управления";
 }
 
 @model Cua.ViewModels.ControlPanelModel
@@ -10,12 +10,12 @@
         <div class="modal-content separate-div modal-div">
             <div class="modal-header">
                 <div class="content-div content-modal-header">
-                    <h5 class="modal-title" id="deleteRoomModalTitle">Delete room?</h5>
+                    <h5 class="modal-title" id="deleteRoomModalTitle">Удалить комнату?</h5>
                 </div>
             </div>
             <div class="modal-footer">
-                <a asp-action="Delete" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Yes</button></a>
-                <button type="button" class="btn btn-secondary yn-btn" data-dismiss="modal">No</button>
+                <a asp-action="Delete" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Да</button></a>
+                <button type="button" class="btn btn-secondary yn-btn" data-dismiss="modal">Нет</button>
             </div>
         </div>
     </div>
@@ -25,7 +25,7 @@
     <div class="row">
         <div class="col">
             <div class="separate-div separate-div-no-col">
-                <div class="content-div my-content-label-div"><p>Participants:</p></div>
+                <div class="content-div my-content-label-div"><p>Участники:</p></div>
             </div>
             <div class="separate-div separate-div-no-col">
                 @foreach (var item in Model.Room.RoomUsers)
@@ -37,23 +37,23 @@
                             <p class="user-id" hidden>@item.User.Id</p>
                             @if (item.IsModerator)
                             {
-                                <a class="my-undo-moderator change-moderator-status" href="#" onclick="return false;">
-                                    <ion-icon name="thumbs-down-outline"></ion-icon>
+                                <a class="my-undo-moderator change-moderator-status" href="#" onclick="return false;" title="Сделать модератором">
+                                    <ion-icon name="trending-up-outline"></ion-icon>
                                 </a>
-                                <a class="my-make-moderator change-moderator-status my-hidden-a" href="#" onclick="return false;" style="display: none;">
-                                    <ion-icon name="thumbs-up-outline"></ion-icon>
+                                <a class="my-make-moderator change-moderator-status my-hidden-a" href="#" onclick="return false;" style="display: none;" title="Отобрать права модератора">
+                                    <ion-icon name="trending-down-outline"></ion-icon>
                                 </a>
                             }
                             else
                             {
-                                <a class="my-make-moderator change-moderator-status" href="#" onclick="return false;">
-                                    <ion-icon name="thumbs-up-outline"></ion-icon>
+                                <a class="my-make-moderator change-moderator-status" href="#" onclick="return false;" title="Сделать модератором">
+                                    <ion-icon name="trending-up-outline"></ion-icon>
                                 </a>
-                                <a class="my-undo-moderator change-moderator-status my-hidden-a" href="#" onclick="return false;" style="display: none;">
-                                    <ion-icon name="thumbs-down-outline"></ion-icon>
+                                <a class="my-undo-moderator change-moderator-status my-hidden-a" href="#" onclick="return false;" style="display: none;" title="Отобрать права модератора">
+                                    <ion-icon name="trending-down-outline"></ion-icon>
                                 </a>
                             }
-                            <a class="my-delete-user-link delete-room-user" href="#" onclick="return false;"><ion-icon name="close-outline"></ion-icon></a>
+                            <a class="my-delete-user-link delete-room-user" href="#" onclick="return false;" title="Исключить из комнаты"><ion-icon name="close-outline"></ion-icon></a>
                         }
                     </div> 
                 }
@@ -63,17 +63,17 @@
             <div class="separate-div">
                 <div class="row">
                     <div class="col-7 my-control-input-holder my-control-input-holder-without-padding" style="display: none;">
-                        <input id="room-name-input" type="text" class="my-input" value="@Model.Room.Name" placeholder="Room name" />
+                        <input id="room-name-input" type="text" class="my-input" value="@Model.Room.Name" placeholder="Название комнаты" />
                     </div>
                     <div id="name-info" class="col-7 content-div my-info-div"><p>@Model.Room.Name</p></div>
                     <div class="col my-control-input-holder my-control-input-holder-without-padding" style="display: none;">
-                        <input id="company-name-input" type="text" class="my-input" value="@Model.Room.Company" placeholder="Company" />
+                        <input id="company-name-input" type="text" class="my-input" value="@Model.Room.Company" placeholder="Организация" />
                     </div>
                     <div id="company-info" class="col content-div my-info-div"><p>@Model.Room.Company</p></div>
                 </div>
                 <div class="row">
                     <div class="col my-control-input-holder my-control-input-holder-without-padding" style="display: none;">
-                        <input id="about-input" type="text" class="my-input" value="@Model.Room.About" placeholder="Short info" />
+                        <input id="about-input" type="text" class="my-input" value="@Model.Room.About" placeholder="Краткое описание комнаты" />
                     </div>
                     <div id="about-info" class="col content-div my-info-div"><p>@Model.Room.About</p></div>
                 </div>
@@ -81,60 +81,60 @@
             <div class="separate-div">
                 <div class="row">
                     <div class="col-4 my-show-queues-btn-holder">
-                        <button type="button" class="btn btn-primary save-changes save-room-changes my-qs-btn" style="display: none;">Save changes</button>
-                        <button type="button" class="btn btn-primary change-description my-qs-btn">Change description</button>
+                        <button type="button" class="btn btn-primary save-changes save-room-changes my-qs-btn" style="display: none;">Сохранить</button>
+                        <button type="button" class="btn btn-primary change-description my-qs-btn">Изменить описание</button>
                     </div>
                     <div class="col-4 my-show-queues-btn-holder">
-                        <a asp-action="Create" asp-controller="Queue" asp-route-roomId=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Create queue</button></a>
+                        <a asp-action="Create" asp-controller="Queue" asp-route-roomId=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Создать очередь</button></a>
                     </div>
                     <div class="col-4 my-show-queues-btn-holder">
-                        <a asp-action="Content" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Back to room</button></a>
+                        <a asp-action="Content" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Назад в комнату</button></a>
                     </div>
                 </div>
                 <br/>
                 <div class="row justify-content-end">
                     <div class="col-4 my-show-queues-btn-holder">
-                        <a asp-action="Candidates" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Add participants</button></a>
+                        <a asp-action="Candidates" asp-controller="Room" asp-route-id=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Добавить участников</button></a>
                     </div>
                     <div class="col-4 my-show-queues-btn-holder">
-                        <a asp-action="Create" asp-controller="Timetable" asp-route-roomId=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Create timetable</button></a>
+                        <a asp-action="Create" asp-controller="Timetable" asp-route-roomId=@Model.Room.Id><button type="button" class="btn btn-primary my-qs-btn">Создать расписание</button></a>
                     </div>
                     @if (Model.Room.Admin == Model.CurrentUser)
                     {
                         <div class="col-4 my-show-queues-btn-holder">
-                            <button type="button" class="btn btn-danger my-qs-btn" data-toggle="modal" data-target="#deleteRoomModal">Delete room</button>
+                            <button type="button" class="btn btn-danger my-qs-btn" data-toggle="modal" data-target="#deleteRoomModal">Удалить комнату</button>
                         </div>
                     }
                 </div>
             </div>
             <br/>
             <div class="separate-div separate-div-no-col">
-                <div class="content-div my-content-label-div"><p>My queues and timetables</p></div>
+                <div class="content-div my-content-label-div"><p>Мои очереди и расписания</p></div>
             </div>
             <div class="separate-div separate-div-no-col">
                 @foreach (var item in Model.Queues)
                 {
                     <div class="content-div my-participant-div">
-                        <p>Queue "@item.Name" (Participants: @item.QueueUsers.Count())</p>
+                        <p>Очередь "@item.Name" (Участники: @item.QueueUsers.Count())</p>
                         <p class="queue-id" hidden>@item.Id</p>
-                        <a asp-action="Settings" asp-controller="Queue" asp-route-id=@item.Id class="my-settings-link"><ion-icon name="settings-outline"></ion-icon></a>
-                        <a class="delete-queue" href="#" onclick="return false;"><ion-icon name="close-outline"></ion-icon></a>
+                        <a asp-action="Settings" asp-controller="Queue" asp-route-id=@item.Id class="my-settings-link" title="Настройки очереди"><ion-icon name="settings-outline"></ion-icon></a>
+                        <a class="delete-queue" href="#" onclick="return false;" title="Удалить"><ion-icon name="close-outline"></ion-icon></a>
                     </div> 
                 }
                 @foreach (var item in Model.Timetables)
                 {
                     <div class="content-div my-participant-div">
-                        <p>Timetable "@item.Name" (Available for booking: @item.Appointments.Where(a => a.IsAvailable).Count())</p>
+                        <p>Расписание "@item.Name" (Доступно для записи: @item.Appointments.Where(a => a.IsAvailable).Count())</p>
                         <p class="timetable-id" hidden>@item.Id</p>
-                        <a asp-action="Settings" asp-controller="Timetable" asp-route-id=@item.Id class="my-settings-link"><ion-icon name="settings-outline"></ion-icon></a>
-                        <a class="delete-timetable" href="#" onclick="return false;"><ion-icon name="close-outline"></ion-icon></a>
+                        <a asp-action="Settings" asp-controller="Timetable" asp-route-id=@item.Id class="my-settings-link" title="Настройки расписания"><ion-icon name="settings-outline"></ion-icon></a>
+                        <a class="delete-timetable" href="#" onclick="return false;"><ion-icon name="close-outline" title="Удалить"></ion-icon></a>
                     </div> 
                 }
             </div>
         </div>
         <div class="col">
             <div class="separate-div separate-div-no-col">
-                <div class="content-div my-content-label-div"><p>Active requests:</p></div>
+                <div class="content-div my-content-label-div"><p>Активные заявки:</p></div>
             </div>
             <div class="separate-div separate-div-no-col">
                 @foreach (var item in Model.Requests)
@@ -142,10 +142,10 @@
                     <div class="my-request-div">
                         <div class="content-div my-participant-div">
                             <p class="request-id" hidden>@item.User.Id</p>
-                            <p>Name: @item.User.Name @item.User.Surname; Comment: @item.Comment</p>
+                            <p>Имя: @item.User.Name @item.User.Surname; комментарий: @item.Comment</p>
                         </div>
-                        <button type="button" class="btn btn-primary request-btn acceptRequest">Accept</button>
-                        <button type="button" class="btn btn-secondary declineRequest" data-dismiss="modal">Decline</button>
+                        <button type="button" class="btn btn-primary request-btn acceptRequest">Принять</button>
+                        <button type="button" class="btn btn-danger declineRequest" data-dismiss="modal">Отклонить</button>
                     </div>
                 }
                 @* <div><a asp-controller="Queue" asp-action="Create" asp-route-roomId=@Model.Id><button type="button"></button></a></div> *@

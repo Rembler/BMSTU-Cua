@@ -638,18 +638,18 @@ $("#remove-first-user").click(function() {
 //  данные поля в записи текущего пользователя
 $("#update-info").click(function() {
 
-    if($(this).text() == "Update information")
+    if($(this).text() == "Обновить информацию")
     {
         $(".info-holder").hide();
         $(".general-input").show();
-        $("#update-info").text("Save changes");
+        $("#update-info").text("Сохранить изменения");
     } else {
         newName = $("#new-name").val();
         newSurname = $("#new-surname").val();
         newCompany = $("#new-company").val();
 
         if (newName == "" || newSurname == "" || newCompany == "") {
-            alert("Some fields are empty");
+            alert("Некоторые поля пусты");
         } else {
             $.post("/Account/UpdateInfo", { name: newName, surname: newSurname, company: newCompany })
                 .done(function(data) {
@@ -665,7 +665,7 @@ $("#update-info").click(function() {
 
                         $(".info-holder").show();
                         $(".general-input").hide();
-                        $("#update-info").text("Update information");
+                        $("#update-info").text("Обновить информацию");
                     }
                 })
         }
@@ -677,10 +677,10 @@ $("#update-info").click(function() {
 //  почты у текущего пользователя и отправляет письмо с подтверждением
 $("#update-email").click(function() {
 
-    if($(this).text() == "Update email") {
+    if($(this).text() == "Обновить электронную почту") {
         $(".email-holder").hide();
         $(".email-input").show();
-        $("#update-email").text("Confirm email");
+        $("#update-email").text("Подтвердить");
     } else {
         var email = $("#new-email").val();
         const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -691,16 +691,16 @@ $("#update-email").click(function() {
 
                     if (data == null) {
                         console.log("Status: FAIL");
-                        alert("This email can't be chosen, try another one");
+                        alert("Ошибка, попробуйте другую электронную почту");
                     } else {
                         console.log("Status: OK");
-                        alert("Email changed successfully. Now check your email box to confirm it");
+                        alert("Электронная почта успешно изменена. Перейдите по ссылке из отправленного письма для подтверждения");
 
                         $("#p-email").text(email);
                     
                         $(".email-holder").show();
                         $(".email-input").hide();
-                        $("#update-email").text("Update email");
+                        $("#update-email").text("Обновить электронную почту");
                     }
                 })
         } else {
@@ -714,34 +714,34 @@ $("#update-email").click(function() {
 //  текущего пользователя
 $("#update-password").click(function() {
 
-    if ($(this).text() == "Update password") {
+    if ($(this).text() == "Обновить пароль") {
         $(".password-div").show();
-        $(this).text("Save password");
+        $(this).text("Подтвердить пароль");
     } else {
         var passwd = $("#new-password").val();
         var passwdConfirmation = $("#new-password-confirmation").val();
 
         if (passwd.length < 6) {
-            alert("Password must contains at least 6 symbols");
+            alert("Пароль должен содержать как минимум 6 символов");
         } else {
             if (passwd != passwdConfirmation) {
-                alert("Passwords are not the same");
+                alert("Пароли не совпадают");
             } else {
                 $.post("/Account/UpdatePassword", { password: passwd })
                     .done(function(data) {
 
                         if (data == null) {
                             console.log("Status: FAIL");
-                            alert("Something goes wrong");
+                            alert("Что-то пошло не так. Попробуйте еще раз");
                         } else {
                             console.log("Status: OK");
 
                             $("#new-password").val("");
                             $("#new-password-confirmation").val("");
                             $(".password-div").hide();
-                            $("#update-password").text("Update password");
+                            $("#update-password").text("Обновить пароль");
 
-                            alert("Password successfully changed");
+                            alert("Пароль успешно изменен");
                         }
                     })
             }
@@ -933,7 +933,7 @@ $(".cancel-appointment").click(function() {
 $(".activity-radio").click(function() {
 
     var status = $(this).is(":checked");
-    var unwantedName = $(this).attr("id").slice(0, $(this).attr("id").indexOf("-"));
+    var unwantedName = $(this).attr("id");
     var activities = $("#items-holder"),
         activitiesList = activities.children();
 

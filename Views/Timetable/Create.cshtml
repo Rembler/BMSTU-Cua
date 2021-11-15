@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Create timetable";
+    ViewData["Title"] = "Создать расписание";
 }
 
 @model Cua.ViewModels.CreateTimetableModel
@@ -9,18 +9,18 @@
         <h2 class="sr-only">Create timetable form</h2>
         <div class="validation" asp-validation-summary="ModelOnly"></div>
         <div class="form-group my-create-input-div">
-            <input class="my-input" type="text" asp-for="Name" placeholder="Name" />
+            <input class="my-input" type="text" asp-for="Name" placeholder="Название" />
             <span asp-validation-for="Name"></span>
         </div>
         <div class="form-group my-create-input-div">
             <input class="my-input" type="text" name="daterange" /> 
         </div>
         <div class="form-group my-create-input-div">
-            <input class="my-input" type="number" asp-for="AppointmentDuration" placeholder="Appointment duration" value="" />
+            <input class="my-input" type="number" asp-for="AppointmentDuration" placeholder="Длительность приема" value="" />
             <span asp-validation-for="AppointmentDuration"></span>
         </div>
         <div class="form-group my-create-input-div">
-            <input class="my-input" type="number" asp-for="BreakDuration" placeholder="Break duration" value="" />
+            <input class="my-input" type="number" asp-for="BreakDuration" placeholder="Длительность перевыва" value="" />
             <span asp-validation-for="BreakDuration"></span>
         </div>
         <div class="form-group">
@@ -34,9 +34,9 @@
         </div>
         <div class="form-group row">
             <a class="my-create-room-back-link" asp-controller="Room" asp-action="Control" asp-route-id=@Model.RoomId>
-                <button type="button" class="btn btn-secondary my-create-room-back-btn">Back</button>
+                <button type="button" class="btn btn-secondary my-create-room-back-btn">Назад</button>
             </a>
-            <input class="btn btn-primary my-create-room-btn" type="submit" value="Create" />
+            <input class="btn btn-primary my-create-room-btn" type="submit" value="Создать" />
         </div>
     </form>
 </div>

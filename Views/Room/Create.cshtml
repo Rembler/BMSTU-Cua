@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Create room";
+    ViewData["Title"] = "Создать комнату";
 }
 
 @model Cua.ViewModels.CreateRoomModel
@@ -9,15 +9,15 @@
     <h2 class="sr-only">Create room form</h2>
     <div class="validation" asp-validation-summary="ModelOnly"></div>
     <div class="form-group my-create-input-div">
-        <input class="my-input" type="text" asp-for="Name" placeholder="Name" />
+        <input class="my-input" type="text" asp-for="Name" placeholder="Название" />
         <span asp-validation-for="Name"></span>
     </div>
     <div class="form-group my-create-input-div">
-        <input class="my-input" type="text" asp-for="Company" placeholder="Organization" value=@Model.Company />
+        <input class="my-input" type="text" asp-for="Company" placeholder="Организация" value=@Model.Company />
         <span asp-validation-for="Company"></span>
     </div>
     <div class="form-group my-create-input-div">
-        <input class="my-input" type="text" asp-for="About" placeholder="Short description" value=@Model.About />
+        <input class="my-input" type="text" asp-for="About" placeholder="Краткое описание" value=@Model.About />
         <span asp-validation-for="About"></span>
     </div>
     <div class="row form-group my-checkbox-div">
@@ -25,7 +25,7 @@
             <input class="my-create-room-checkbox" type="checkbox" asp-for="Hidden"/>
         </div>
         <div id="my-hidden-label-holder" class="content-div">
-            <p class="my-checkbox-label">Hide room?</p>
+            <p class="my-checkbox-label">Скрыть комнату?</p>
         </div>
     </div>
     <div class="row form-group">
@@ -33,14 +33,14 @@
             <input class="my-create-room-checkbox" type="checkbox" asp-for="Private"/>
         </div>
         <div id="my-private-label-holder" class="content-div">
-            <p class="my-checkbox-label">Make room private?</p>
+            <p class="my-checkbox-label">Сделать комнату закрытой?</p>
         </div>
     </div>
     <div class="form-group row">
         <a class="my-create-room-back-link" asp-controller="Home" asp-action="Index">
-            <button type="button" class="btn btn-secondary my-create-room-back-btn">Back</button>
+            <button type="button" class="btn btn-secondary my-create-room-back-btn">Назад</button>
         </a>
-        <input class="btn btn-primary my-create-room-btn" type="submit" value="Create" />
+        <input class="btn btn-primary my-create-room-btn" type="submit" value="Создать" />
     </div>
 </form>
 </div>

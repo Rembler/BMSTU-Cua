@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Activities";
+    ViewData["Title"] = "Очереди и расписания";
 }
 
 @model Cua.ViewModels.ActivitiesModel
@@ -10,12 +10,12 @@
         <div class="modal-content separate-div modal-div">
             <div class="modal-header">
                 <div class="content-div content-modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Want to join a queue?</h5>
+                    <h5 class="modal-title" id="exampleModalLongTitle">Хотите присоединиться к очереди?</h5>
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="addQueue" type="button" class="btn btn-primary yn-btn">Yes</button>
-                <button type="button" class="btn btn-secondary yn-btn" data-dismiss="modal">No</button>
+                <button id="addQueue" type="button" class="btn btn-primary yn-btn">Да</button>
+                <button type="button" class="btn btn-secondary yn-btn" data-dismiss="modal">Нет</button>
             </div>
         </div>
     </div>
@@ -30,7 +30,7 @@
                 <p id="end-date" hidden></p>
                 <div class="row">
                     <div class="my-input-holder col">
-                        <input type="text" id="datepicker" class="my-input" placeholder="Pick a date" readonly/>
+                        <input type="text" id="datepicker" class="my-input" placeholder="Выберите дату" readonly/>
                     </div>
                 </div>
             </div>
@@ -42,7 +42,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="make-an-appointment" type="button" class="btn btn-primary yn-btn">Confirm</button>
+                <button id="make-an-appointment" type="button" class="btn btn-primary yn-btn">Подтвердить</button>
             </div>
         </div>
     </div>
@@ -54,28 +54,28 @@
             <div class="row">
                 <div class="separate-div col">
                     <a asp-action="Content" asp-controller="Room" asp-route-id=@ViewContext.RouteData.Values["id"]>
-                        <button type="button" class="btn btn-primary my-back-btn">Back</button>
+                        <button type="button" class="btn btn-primary my-back-btn">Назад</button>
                     </a>
                 </div>
             </div>
             <div class="row">
                 <div class="separate-div">
-                    <input id="room-cri" class="my-input criteria-input" type="text" placeholder="Activity name"/>
+                    <input id="room-cri" class="my-input criteria-input" type="text" placeholder="Название"/>
                     <div class="checkbox-holder">
-                        <input id="queue-remove" class="activity-radio" type="radio" name="activity-type"/><label>Only timetables</label>
+                        <input id="очередь" class="activity-radio" type="radio" name="activity-type"/><label>Только расписания</label>
                     </div>
                     <div class="checkbox-holder">
-                        <input id="timetable-remove" class="activity-radio" type="radio" name="activity-type"/><label>Only queues</label>
+                        <input id="расписание" class="activity-radio" type="radio" name="activity-type"/><label>Только очереди</label>
                     </div>
                     <div class="checkbox-holder">
-                        <input id="everything-on-screen" class="activity-radio" type="radio" name="activity-type"/><label>Everything</label>
+                        <input id="everything-on-screen" class="activity-radio" type="radio" name="activity-type"/><label>Все</label>
                     </div>
                 </div>
             </div>
             </br>
             <div class="row">
                 <div class="separate-div separate-div-no-col">
-                    <div class="content-div my-content-label-div"><p>Participants:</p></div>
+                    <div class="content-div my-content-label-div"><p>Участники:</p></div>
                 </div>
                 <div id="participants-list" class="separate-div-no-col">
                 </div>
@@ -87,49 +87,49 @@
             <div class="separate-div room-for-join-div container">
                 <p id="queueId-@item.Id" class="hidden-p" hidden>@item.Id</p>
                 <div class="row">
-                    <div class="col-2 content-div my-content-label-div"><p>Queue</p></div>
+                    <div class="col-2 content-div my-content-label-div"><p>Очередь</p></div>
                     <div class="col content-div"><p class="room-name">@item.Name</p></div>
                     @if (item.Creator == Model.CurrentUser)
                     {
                         <div class="col-3 join-btn-holder">
                         @if (item.Active)
                         {
-                            <button class="btn btn-danger join-room-btn change-active-status">Stop</button>
+                            <button class="btn btn-danger join-room-btn change-active-status">Остановить</button>
                         }
                         else
                         {
-                            <button class="btn btn-primary join-room-btn change-active-status">Start</button>
+                            <button class="btn btn-primary join-room-btn change-active-status">Начать</button>
                         }  
                         </div>
                     }
                 </div>
                 <div class="row">
-                    <div class="col content-div company-name"><p>Number of participants: </p><p class="num-of-participants">@item.QueueUsers.Count()</p></div>
-                    <div class="col content-div"><p>Limit: @item.Limit</p></div>
+                    <div class="col content-div company-name"><p>Количество участников: </p><p class="num-of-participants">@item.QueueUsers.Count()</p></div>
+                    <div class="col content-div"><p>Ограничение: @item.Limit</p></div>
                     <div class="col-3 join-btn-holder">
-                        <button class="btn btn-primary join-room-btn show-participants-btn"> Show all participants</button>
+                        <button class="btn btn-primary join-room-btn show-participants-btn">Показать участников</button>
                     </div>
                     
                 </div>
                 <div class="row">
-                    <div class="col content-div"><p>Start: @item.StartAt.ToString("dd.MM.yyyy") at @item.StartAt.ToString("HH:mm")</p></div>
-                    <div class="col content-div"><p class="admin-name">Creator: @item.Creator.Name @item.Creator.Surname</p><br/></div>
+                    <div class="col content-div"><p>Начало: @item.StartAt.ToString("dd.MM.yyyy") в @item.StartAt.ToString("HH:mm")</p></div>
+                    <div class="col content-div"><p class="admin-name">Создатель: @item.Creator.Name @item.Creator.Surname</p><br/></div>
                     <div class="col-3 join-btn-holder">
                         @if (item.QueueUsers.Any(qu => qu.User == Model.CurrentUser))
                         {
-                            <button class="btn btn-danger join-room-btn leave-queue-btn">Leave</button>
-                            <button class="btn btn-primary join-room-btn id-giver join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter" style="display: none;">Join</button>
+                            <button class="btn btn-danger join-room-btn leave-queue-btn">Покинуть</button>
+                            <button class="btn btn-primary join-room-btn id-giver join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter" style="display: none;">Присоединиться</button>
                         }
                         else
                         {
-                            <button class="btn btn-danger join-room-btn leave-queue-btn" style="display: none;">Leave</button>
+                            <button class="btn btn-danger join-room-btn leave-queue-btn" style="display: none;">Покинуть</button>
                             @if (item.Limit != 0 && item.Limit == item.QueueUsers.Count())
                             {
-                                <button class="btn btn-primary join-room-btn id-giver join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter" disabled>Join</button>
+                                <button class="btn btn-primary join-room-btn id-giver join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter" disabled>Присоединиться</button>
                             }
                             else
                             {
-                                <button class="btn btn-primary join-room-btn id-giver join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter">Join</button>
+                                <button class="btn btn-primary join-room-btn id-giver join-queue-btn" data-toggle="modal" data-target="#exampleModalCenter">Присоединиться</button>
                             }
                         }
                     </div>
@@ -141,40 +141,40 @@
             <div class="separate-div room-for-join-div container">
                 <p id="queueId-@item.Id" class="hidden-p" hidden>@item.Id</p>
                 <div class="row">
-                    <div class="col-2 content-div my-content-label-div"><p>Timetable</p></div>
+                    <div class="col-2 content-div my-content-label-div"><p>Расписание</p></div>
                     <div class="col content-div"><p class="room-name">@item.Name</p></div>
                 </div>
                 <div class="row">
-                    <div class="col-7 content-div"><p>Appointment is available from @item.StartDate.ToString("dd.MM.yyyy") to @item.EndDate.ToString("dd.MM.yyyy")</p></div>
-                    <div class="col content-div company-name"><p>Creator: @item.Creator.Name @item.Creator.Surname</p></div>
+                    <div class="col-7 content-div"><p>Запись доступна с @item.StartDate.ToString("dd.MM.yyyy") до @item.EndDate.ToString("dd.MM.yyyy")</p></div>
+                    <div class="col content-div company-name"><p>Создатель: @item.Creator.Name @item.Creator.Surname</p></div>
                 </div>
                 <div class="row">
                     @if (item.Appointments.Any(a => a.UserId != null && a.UserId == Model.CurrentUser.Id))
                     {
                         <div class="col-7 content-div">
-                            <p class="own-appointment">Your appointment: @item.Appointments.FirstOrDefault(a => a.UserId == Model.CurrentUser.Id).StartAt.ToString("dd.MM.yyyy HH:mm")</p>
-                            <p class="available-appointments" style="display: none;">Number of available appointments: @{ int i = item.Appointments.Where(a => a.IsAvailable).Count() + 1; } @i</p>
+                            <p class="own-appointment">Ваша запись: @item.Appointments.FirstOrDefault(a => a.UserId == Model.CurrentUser.Id).StartAt.ToString("dd.MM.yyyy HH:mm")</p>
+                            <p class="available-appointments" style="display: none;">Для записи доступно: @{ int i = item.Appointments.Where(a => a.IsAvailable).Count() + 1; } @i</p>
                         </div>
                         <div class="col join-btn-holder">
-                            <button class="btn btn-danger join-room-btn cancel-appointment">Cancel an appointment</button>
-                            <button class="btn btn-primary join-room-btn show-appointment-modal" data-toggle="modal" data-target="#appointmentModal" style="display: none;" >Make an appointment</button>
+                            <button class="btn btn-danger join-room-btn cancel-appointment">Отменить запись</button>
+                            <button class="btn btn-primary join-room-btn show-appointment-modal" data-toggle="modal" data-target="#appointmentModal" style="display: none;" >Записаться</button>
                         </div>
                     }
                     else
                     {
                         <div class="col-7 content-div">
-                            <p class="available-appointments">Number of available appointments: @item.Appointments.Where(a => a.IsAvailable).Count()</p>
+                            <p class="available-appointments">Для записи доступно: @item.Appointments.Where(a => a.IsAvailable).Count()</p>
                             <p class="own-appointment" style="display: none;"></p>
                         </div>
                         <div class="col join-btn-holder">
                             @if (item.CreatorId == Model.CurrentUser.Id)
                             {
-                                <button class="btn btn-primary join-room-btn" disabled>Make an appointment</button>
+                                <button class="btn btn-primary join-room-btn" disabled>Записаться</button>
                             }
                             else
                             {
-                                <button class="btn btn-primary join-room-btn show-appointment-modal" data-toggle="modal" data-target="#appointmentModal">Make an appointment</button>
-                                <button class="btn btn-danger join-room-btn cancel-appointment" style="display: none;">Cancel an appointment</button>
+                                <button class="btn btn-primary join-room-btn show-appointment-modal" data-toggle="modal" data-target="#appointmentModal">Записаться</button>
+                                <button class="btn btn-danger join-room-btn cancel-appointment" style="display: none;">Отменить запись</button>
                             }
                         </div>
                     }

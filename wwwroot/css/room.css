@@ -128,3 +128,7 @@ option {
 .my-notification:hover {
     cursor: pointer;
 }
+
+ion-icon {
+    pointer-events: none;
+}

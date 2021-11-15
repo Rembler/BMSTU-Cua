@@ -222,7 +222,7 @@ namespace Cua.Controllers
 
             if (user.Email == email)
             {
-                Console.Write("New email and old email are the same");
+                Console.Write("Новая электронная почта совпадает со старой");
                 return Json(null);
             } 
             else
@@ -230,7 +230,7 @@ namespace Cua.Controllers
                 User existingUser = await _userdb.GetUserByEmailAsync(email);
                 if (existingUser != null)
                 {
-                    Console.Write("User with email " + email + " already exists");
+                    Console.Write("Пользователь с почтой " + email + " уже существует");
                     return Json(null);
                 }
                 else

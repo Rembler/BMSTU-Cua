@@ -32,6 +32,14 @@ namespace Cua.Services
                 foreach (var item in queueUsers.Where(qu => qu.Place > removedQueueUser.Place))
                     item.Place--;
                 db.QueueUsers.UpdateRange(queueUsers);
+                await db.SaveChangesAsync();
+
+                QueueUser toNotify = await db.QueueUsers
+                    .Include(qu => qu.Queue)
+                    .Include(qu => qu.User)
+                    .FirstOrDefaultAsync(qu => qu.Queue.Active && qu.Place == 1);
+                if (toNotify != null)
+                    await _hub.Clients.User(toNotify.User.Email).SendAsync("ReceiveNotification", "Вы следующий в очереди " + toNotify.Queue.Name);
 
                 HubGroup hubGroup = await db.HubGroups.Include(hg => hg.HubUsers).FirstOrDefaultAsync(hg => hg.Name == "queue-" + queue.Id);
                 HubUser hubUser = await db.HubUsers.FindAsync(user.Email);
@@ -90,14 +98,14 @@ namespace Cua.Services
                 string msg = "";
                 if (item.NotificationCount == 0 && timeLeft <= 30 && timeLeft > 0)
                 {
-                    msg = "Queue \"" + item.Name + "\" will start in " + timeLeft + " minutes";
+                    msg = "Очередь \"" + item.Name + "\" начнется через " + timeLeft + " мин.";
                     Console.WriteLine(msg);                    
                     await _hub.Clients.Group("queue-" + item.Id).SendAsync("ReceiveNotification", msg);
                     item.NotificationCount++;
                 }
                 else if (timeLeft <= 0)
                 {
-                    msg = "Queue \"" + item.Name + "\" just started";
+                    msg = "Очередь \"" + item.Name + "\" уже началась";
                     Console.WriteLine(msg);
                     await _hub.Clients.Group("queue-" + item.Id).SendAsync("ReceiveNotification", msg);
                     item.NotificationCount = 2;
@@ -129,7 +137,7 @@ namespace Cua.Services
                 string msg = "";
                 if (item.NotificationCount == 0 && timeLeft <= 30 && timeLeft > 0)
                 {
-                    msg = "Appointment from timetable \"" + item.Timetable.Name + "\" will start in " + timeLeft + " minutes";
+                    msg = "Прием по распианию \"" + item.Timetable.Name + "\" начнется через " + timeLeft + " мин.";
                     await _hub.Clients.User(item.Timetable.Creator.Email).SendAsync("ReceiveNotification", msg);
                     await _hub.Clients.User(item.User.Email).SendAsync("ReceiveNotification", msg);
                     Console.WriteLine(msg);
@@ -137,7 +145,7 @@ namespace Cua.Services
                 }
                 else if (timeLeft <= 0)
                 {
-                    msg = "Appointment from timetable \"" + item.Timetable.Name + "\" just started";
+                    msg = "Прием по расписанию \"" + item.Timetable.Name + "\" уже начался";
                     await _hub.Clients.User(item.Timetable.Creator.Email).SendAsync("ReceiveNotification", msg);
                     await _hub.Clients.User(item.User.Email).SendAsync("ReceiveNotification", msg);
                     Console.WriteLine(msg);

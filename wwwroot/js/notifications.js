@@ -7,7 +7,7 @@ connection.on("ReceiveNotification", function (message) {
     var notification = $("<div></div>").addClass("content-div my-queue-member-holder");
     var text = $("<p></p>").text(message);
     holder.append(notification.append(text));
-    alert("You got new notification");
+    alert("У вас новое уведомление!");
 });
 
 connection.on("ReceiveMessage", function (user, message) {

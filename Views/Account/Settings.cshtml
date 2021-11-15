@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Account settings";
+    ViewData["Title"] = "Настройки аккаунта";
 }
 
 @model Cua.ViewModels.RegisterModel
@@ -10,12 +10,12 @@
         <div class="modal-content separate-div modal-div">
             <div class="modal-header">
                 <div class="content-div content-modal-header">
-                    <h5 class="modal-title" id="deleteUserModalTitle">Delete account?</h5>
+                    <h5 class="modal-title" id="deleteUserModalTitle">Удалить аккаунт?</h5>
                 </div>
             </div>
             <div class="modal-footer">
-                <a asp-action="Delete" asp-controller="Account"><button type="button" class="btn btn-primary my-qs-btn">Yes</button></a>
-                <button type="button" class="btn btn-secondary yn-btn" data-dismiss="modal">No</button>
+                <a asp-action="Delete" asp-controller="Account"><button type="button" class="btn btn-primary my-qs-btn">Да</button></a>
+                <button type="button" class="btn btn-secondary yn-btn" data-dismiss="modal">Нет</button>
             </div>
         </div>
     </div>
@@ -23,31 +23,31 @@
 
 <div class="container separate-div my-account-info-div">
     <div class="row">
-        <div class="col-3 my-property-description"><p>Name</p></div>
+        <div class="col-3 my-property-description"><p>Имя</p></div>
         <div class="content-div col info-holder"><p id="p-name">@Model.Name</p></div>
         <div class="col my-input-holder general-input" style="display: none;">
-            <input id="new-name" class="my-input" type="text" placeholder="Name" value=@Model.Name />
+            <input id="new-name" class="my-input" type="text" placeholder="Имя" value=@Model.Name />
         </div>
     </div>
     <div class="row">
-        <div class="col-3 my-property-description"><p>Surname</p></div>
+        <div class="col-3 my-property-description"><p>Фамилия</p></div>
         <div class="content-div col info-holder"><p id="p-surname">@Model.Surname</p></div>
         <div class="col my-input-holder general-input" style="display: none;">
-            <input id="new-surname" class="my-input" type="text" placeholder="Surname" value=@Model.Surname />
+            <input id="new-surname" class="my-input" type="text" placeholder="Фамилия" value=@Model.Surname />
         </div>
     </div>
     <div class="row">
-        <div class="col-3 my-property-description"><p>Email</p></div>
+        <div class="col-3 my-property-description"><p>Электронная почта</p></div>
         <div class="content-div col email-holder"><p id="p-email">@Model.Email</p></div>
         <div class="col my-input-holder email-input" style="display: none;">
-            <input id="new-email" class="my-input" type="text" placeholder="Email" value=@Model.Email />
+            <input id="new-email" class="my-input" type="text" placeholder="Электронная почта" value=@Model.Email />
         </div>
     </div>
     <div class="row">
-        <div class="col-3 my-property-description"><p>Organization</p></div>
+        <div class="col-3 my-property-description"><p>Организация</p></div>
         <div class="content-div col info-holder"><p id="p-company">@Model.Company</p></div>
         <div class="col my-input-holder general-input" style="display: none;">
-            <input id="new-company" class="my-input" type="text" placeholder="Organization" value=@Model.Company />
+            <input id="new-company" class="my-input" type="text" placeholder="Организация" value=@Model.Company />
         </div>
     </div>
 </div>
@@ -55,19 +55,19 @@
 <div class="container separate-div my-account-info-div">
     <div class="row">
         <div class="col">
-            <button id="update-info" type="button" class="btn btn-primary my-qs-btn">Update information</button>
+            <button id="update-info" type="button" class="btn btn-primary my-qs-btn">Обновить информацию</button>
         </div>
         <div class="col">
-            <button id="update-email" type="button" class="btn btn-primary my-qs-btn">Update email</button>
+            <button id="update-email" type="button" class="btn btn-primary my-qs-btn">Обновить электронную почту</button>
         </div>
         <div class="col">
-            <button id="update-password" type="button" class="btn btn-primary my-qs-btn">Update password</button>
+            <button id="update-password" type="button" class="btn btn-primary my-qs-btn">Обновить пароль</button>
         </div>
     </div>
     <br/>
     <div class="row justify-content-end">
         <div class="col-4">
-            <button type="button" class="btn btn-danger my-qs-btn" data-toggle="modal" data-target="#deleteUserModal">Delete account</button>
+            <button type="button" class="btn btn-danger my-qs-btn" data-toggle="modal" data-target="#deleteUserModal">Удалить аккаунт</button>
         </div>
     </div>
 </div>
@@ -75,12 +75,12 @@
 <div class="container separate-div my-account-info-div password-div" style="display: none;">
     <div class="row">
         <div class="col my-input-holder">
-            <input id="new-password" class="my-input" type="password" placeholder="Password" />
+            <input id="new-password" class="my-input" type="password" placeholder="Пароль" />
         </div>
     </div>
     <div class="row">
         <div class="col my-input-holder">
-            <input id="new-password-confirmation" class="my-input" type="password" placeholder="Confirm password" />
+            <input id="new-password-confirmation" class="my-input" type="password" placeholder="Подтвердите пароль" />
         </div>
     </div>
 </div>

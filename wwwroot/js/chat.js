@@ -11,3 +11,8 @@ document.getElementById("send-message").addEventListener("click", function (even
         event.preventDefault();
     }
 });
+
+// $(document).ready(function() {
+
+    
+// });

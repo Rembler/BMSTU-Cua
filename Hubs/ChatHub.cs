@@ -48,42 +48,48 @@ namespace Cua.Hubs
             await Clients.Group(groupName).SendAsync("ReceiveMessage", user, message);
         }
 
-        public async Task SendNotification(string groupName, string user, string message)
+        public async Task SendRemovalWish(string queueId)
         {
-            // SaveMessage(Int32.Parse(groupName), user, message);
-            await Clients.Group(groupName).SendAsync("ReceiveNotification", user, message);
+            Console.WriteLine("Wish was sent");
+            await Clients.All.SendAsync("ReceiveRemovalWish", queueId);
         }
 
-        public Task JoinGroup(string groupName)
-        {
-            if (groupName == "")
-                groupName = "user-" + db.Users.FirstOrDefault(u => u.Email == Context.User.Identity.Name).Id;
-            var group = db.HubGroups.Include(hg => hg.HubUsers).FirstOrDefault(hg => hg.Name == groupName);
-            if (group == null)
-            {
-                group = new HubGroup() { Name = groupName, HubUsers = new List<HubUser>() };
-                db.HubGroups.Add(group);
-            }
-            var user = db.HubUsers.Find(Context.User.Identity.Name);
-            if (user == null)
-            {
-                user = new HubUser() { Name = Context.User.Identity.Name };
-                db.HubUsers.Add(user);
-            }
-            db.HubUsers.Attach(user);
-            group.HubUsers.Add(user);
-            db.SaveChanges();
-            return Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-        }
+        // public async Task SendNotification(string groupName, string user, string message)
+        // {
+        //     // SaveMessage(Int32.Parse(groupName), user, message);
+        //     await Clients.Group(groupName).SendAsync("ReceiveNotification", user, message);
+        // }
 
-        public Task LeaveGroup(string groupName)
-        {
-            var group = db.HubGroups.Include(hg => hg.HubUsers).FirstOrDefault(hg => hg.Name == groupName);
-            var user = db.HubUsers.Find(Context.User.Identity.Name);
-            group.HubUsers.Remove(user);
-            db.SaveChanges();
-            return Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
-        }
+        // public Task JoinGroup(string groupName)
+        // {
+        //     if (groupName == "")
+        //         groupName = "user-" + db.Users.FirstOrDefault(u => u.Email == Context.User.Identity.Name).Id;
+        //     var group = db.HubGroups.Include(hg => hg.HubUsers).FirstOrDefault(hg => hg.Name == groupName);
+        //     if (group == null)
+        //     {
+        //         group = new HubGroup() { Name = groupName, HubUsers = new List<HubUser>() };
+        //         db.HubGroups.Add(group);
+        //     }
+        //     var user = db.HubUsers.Find(Context.User.Identity.Name);
+        //     if (user == null)
+        //     {
+        //         user = new HubUser() { Name = Context.User.Identity.Name };
+        //         db.HubUsers.Add(user);
+        //     }
+        //     db.HubUsers.Attach(user);
+        //     group.HubUsers.Add(user);
+        //     db.SaveChanges();
+        //     return Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+        // }
+
+        // public Task LeaveGroup(string groupName)
+        // {
+        //     var group = db.HubGroups.Include(hg => hg.HubUsers).FirstOrDefault(hg => hg.Name == groupName);
+        //     var user = db.HubUsers.Find(Context.User.Identity.Name);
+        //     group.HubUsers.Remove(user);
+        //     db.SaveChanges();
+        //     return Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
+        // }
 
         private int SaveMessage(int roomId, string userName, string messageBody)
         {

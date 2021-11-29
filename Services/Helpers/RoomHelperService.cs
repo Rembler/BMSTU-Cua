@@ -128,13 +128,7 @@ namespace Cua.Services
                 roomUser.IsModerator = !roomUser.IsModerator;
                 if (!roomUser.IsModerator)
                 {
-                    List<Queue> changedQueues = await db.Queues
-                        .Include(q => q.Creator)
-                        .Where(q => q.Creator == user)
-                        .ToListAsync();
-                    foreach (var item in changedQueues)
-                        item.Creator = room.Admin;
-                    db.Queues.UpdateRange(changedQueues);
+                    await ChangeQueuesCreatorAsync(user, room);
                 }
                 db.RoomUsers.Update(roomUser);
                 await db.SaveChangesAsync();
@@ -158,6 +152,8 @@ namespace Cua.Services
                 
                 db.RoomUsers.Remove(removedRoomUser);
 
+                await ChangeQueuesCreatorAsync(user, room);
+
                 HubGroup hubGroup = await db.HubGroups.Include(hg => hg.HubUsers).FirstOrDefaultAsync(hg => hg.Name == "room-" + room.Id);
                 HubUser hubUser = await db.HubUsers.FindAsync(user.Email);
                 hubGroup.HubUsers.Remove(hubUser);
@@ -166,6 +162,18 @@ namespace Cua.Services
                 return true;
             }
             return false;           
+        }
+
+        public async Task ChangeQueuesCreatorAsync(User user, Room room)
+        {
+            List<Queue> changedQueues = await db.Queues
+                .Include(q => q.Creator)
+                .Where(q => q.Creator == user)
+                .ToListAsync();
+            foreach (var item in changedQueues)
+                item.Creator = room.Admin;
+            db.Queues.UpdateRange(changedQueues);
+            await db.SaveChangesAsync();
         }
 
         public async Task AddRequestAsync(User user, Room room, string comment, bool isFromRoom)

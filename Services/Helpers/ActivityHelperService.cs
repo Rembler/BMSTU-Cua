@@ -13,12 +13,12 @@ namespace Cua.Services
     public class ActivityHelperService
     {
         private ApplicationContext db;
-        private readonly IHubContext<ChatHub> _hub;
+        private readonly SharedHelperService shared;
 
-        public ActivityHelperService(ApplicationContext context, IHubContext<ChatHub> hubContext)
+        public ActivityHelperService(ApplicationContext context, SharedHelperService sharedHelperService)
         {
             db = context;
-            _hub = hubContext;
+            shared = sharedHelperService;
         }
 
         public async Task CreateQueueAsync(User user, CreateQueueModel model)
@@ -44,14 +44,6 @@ namespace Cua.Services
             await db.SaveChangesAsync();
         }
 
-        public async Task<Queue> GetQueueAsync(int id)
-        {
-            return await db.Queues
-                .Include(q => q.QueueUsers)
-                .ThenInclude(qu => qu.User)
-                .FirstOrDefaultAsync(q => q.Id == id);
-        }
-
         public async Task<List<QueueUser>> GetQueueUsersAsync(int id)
         {
             return await db.QueueUsers.Where(qu => qu.QueueId == id).ToListAsync();
@@ -59,7 +51,7 @@ namespace Cua.Services
 
         public async Task<bool> DeleteQueueAsync(int id)
         {
-            Queue removedQueue = await GetQueueAsync(id);
+            Queue removedQueue = await shared.GetQueueAsync(id);
             if (removedQueue != null)
             {
                 List<QueueUser> removedQueueUsers = await GetQueueUsersAsync(id);
@@ -77,7 +69,7 @@ namespace Cua.Services
 
         public async Task<bool> UpdateQueueAsync(int id, string name, int limit, DateTime startAt)
         {
-            Queue updatedQueue = await GetQueueAsync(id);
+            Queue updatedQueue = await shared.GetQueueAsync(id);
             if (updatedQueue != null)
             {
                 updatedQueue.Name = name;
@@ -94,35 +86,9 @@ namespace Cua.Services
             return false;
         }
 
-        public async Task<bool> AddUserToQueueAsync(User user, int queueId)
-        {
-            Queue queue = await GetQueueAsync(queueId);
-            int place = queue.QueueUsers.Any() ? queue.QueueUsers.Max(qu => qu.Place) + 1 : 1;
-
-            if (user != null && queue != null)
-            {
-                if (queue.Limit == 0 || queue.Limit > queue.QueueUsers.Count())
-                {
-                    if (!queue.QueueUsers.Any(qu => qu.User == user))
-                    {
-                        QueueUser queueUser = new QueueUser() { User = user, Queue = queue, Place = place };
-                        db.QueueUsers.Update(queueUser);
-
-                        HubGroup hubGroup = await db.HubGroups.Include(hg => hg.HubUsers).FirstOrDefaultAsync(hg => hg.Name == "queue-" + queueId);
-                        HubUser hubUser = await db.HubUsers.FindAsync(user.Email);
-                        hubGroup.HubUsers.Add(hubUser);
-
-                        await db.SaveChangesAsync();
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
         public async Task<bool> ChangeQueueActiveStatusAsync(int id)
         {
-            Queue queue = await GetQueueAsync(id);
+            Queue queue = await shared.GetQueueAsync(id);
             if (queue != null)
             {
                 queue.Active = !queue.Active;

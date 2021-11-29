@@ -72,7 +72,7 @@ namespace Cua.Controllers
             if (!_authorizer.IsQueueCreator(HttpContext, id))
                 return RedirectToAction("Warning", "Home", new { message = "Вы не создатель этой очереди"});
 
-            Queue queue = await _queuedb.GetQueueAsync(id);               
+            Queue queue = await _shareddb.GetQueueAsync(id);               
             return View(queue);
         }
 
@@ -93,7 +93,7 @@ namespace Cua.Controllers
                 return RedirectToAction("Warning", "Home", new { message = "Вы не участник этой комнаты"});
 
             User user = await _authorizer.GetCurrentUserAsync(HttpContext);
-            if (await _queuedb.AddUserToQueueAsync(user, id))
+            if (await _shareddb.AddUserToQueueAsync(user, id))
                 return Json("OK");
             else
                 return Json(null);
@@ -115,7 +115,7 @@ namespace Cua.Controllers
             if (!_authorizer.IsMember(HttpContext, roomId))
                 return RedirectToAction("Warning", "Home", new { message = "Вы не участник этой комнаты"});
 
-            Queue queue = await _queuedb.GetQueueAsync(id);
+            Queue queue = await _shareddb.GetQueueAsync(id);
             
             if (queue != null)
             {
@@ -150,7 +150,7 @@ namespace Cua.Controllers
                 userId = (await _authorizer.GetCurrentUserAsync(HttpContext)).Id;
 
             User user = await _shareddb.GetUserByIdAsync((int)userId);
-            Queue queue = await _queuedb.GetQueueAsync(id);
+            Queue queue = await _shareddb.GetQueueAsync(id);
             
             if (await _shareddb.RemoveUserFromQueueAsync(user, queue))
                 return Json("OK");

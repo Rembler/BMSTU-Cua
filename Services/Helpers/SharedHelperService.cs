@@ -34,21 +34,64 @@ namespace Cua.Services
                 db.QueueUsers.UpdateRange(queueUsers);
                 await db.SaveChangesAsync();
 
-                QueueUser toNotify = await db.QueueUsers
-                    .Include(qu => qu.Queue)
-                    .Include(qu => qu.User)
-                    .FirstOrDefaultAsync(qu => qu.Queue.Active && qu.Place == 1);
-                if (toNotify != null)
-                    await _hub.Clients.User(toNotify.User.Email).SendAsync("ReceiveNotification", "Вы следующий в очереди " + toNotify.Queue.Name);
+                if (removedQueueUser.Place == 1)
+                {
+                    QueueUser toNotify = await db.QueueUsers
+                        .Include(qu => qu.Queue)
+                        .Include(qu => qu.User)
+                        .FirstOrDefaultAsync(qu => qu.Queue.Active 
+                            && qu.Place == 1 
+                            && qu.QueueId == removedQueueUser.QueueId);
+                    if (toNotify != null)
+                        await _hub.Clients.User(toNotify.User.Email).SendAsync("ReceiveNotification", "Вы следующий в очереди " + toNotify.Queue.Name);
+                }
 
                 HubGroup hubGroup = await db.HubGroups.Include(hg => hg.HubUsers).FirstOrDefaultAsync(hg => hg.Name == "queue-" + queue.Id);
                 HubUser hubUser = await db.HubUsers.FindAsync(user.Email);
                 hubGroup.HubUsers.Remove(hubUser);
+
+                await _hub.Clients.All.SendAsync("ReceiveRemovalWish", queue.Id, removedQueueUser.Place - 1);
                 
                 await db.SaveChangesAsync();
                 return true;
             }
             return false;
+        }
+
+        public async Task<bool> AddUserToQueueAsync(User user, int queueId)
+        {
+            Queue queue = await GetQueueAsync(queueId);
+            int place = queue.QueueUsers.Any() ? queue.QueueUsers.Max(qu => qu.Place) + 1 : 1;
+
+            if (user != null && queue != null)
+            {
+                if (queue.Limit == 0 || queue.Limit > queue.QueueUsers.Count())
+                {
+                    if (!queue.QueueUsers.Any(qu => qu.User == user))
+                    {
+                        QueueUser queueUser = new QueueUser() { User = user, Queue = queue, Place = place };
+                        db.QueueUsers.Update(queueUser);
+
+                        HubGroup hubGroup = await db.HubGroups.Include(hg => hg.HubUsers).FirstOrDefaultAsync(hg => hg.Name == "queue-" + queueId);
+                        HubUser hubUser = await db.HubUsers.FindAsync(user.Email);
+                        hubGroup.HubUsers.Add(hubUser);
+
+                        await _hub.Clients.All.SendAsync("ReceiveAdditionWish", queue.Id, user.Name + " " + user.Surname, user.Id);
+
+                        await db.SaveChangesAsync();
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public async Task<Queue> GetQueueAsync(int id)
+        {
+            return await db.Queues
+                .Include(q => q.QueueUsers)
+                .ThenInclude(qu => qu.User)
+                .FirstOrDefaultAsync(q => q.Id == id);
         }
 
         public async Task<bool> RemoveUserFromTimetableAsync(User user, Timetable timetable)

@@ -389,11 +389,11 @@ $(".change-active-status").click(function() {
             } else {
                 console.log("Status: " + data);
 
-                if (clickedBtn.text() == "Start") {
-                    clickedBtn.text("Stop");
+                if (clickedBtn.text() == "Начать") {
+                    clickedBtn.text("Остановить");
                     clickedBtn.removeClass("btn-primary").addClass("btn-danger");
                 } else {
-                    clickedBtn.text("Start");
+                    clickedBtn.text("Начать");
                     clickedBtn.removeClass("btn-danger").addClass("btn-primary");
                 }
             }
@@ -572,17 +572,18 @@ $(".queue-control").click(function() {
             } else {
                 console.log("Status: OK");
 
-                var target = $("#my-queue-members");
-                target.empty();
+                var target = $("#my-queue-members").empty();
+                var subTarget = $("#their-queue-members").empty();
 
                 if (data == 0) {
-                    var infoDiv = $("<div></div>").addClass("content-div my-queue-member-holder");
-                    var infoP = $("<p></p>").text("No users are in queue");
+                    var infoDiv = $("<div></div>").addClass("content-div my-queue-member-holder no-users-info");
+                    var infoP = $("<p></p>").text("Очередь пуста");
 
                     // infoDiv.append(infoP);
                     target.append(infoDiv.append(infoP));
                     $("#remove-first-user").prop("disabled", true);
                 } else {
+                    $("#remove-first-user").prop("disabled", false);
                     data.sort((a, b) => (a.place > b.place ? 1 : -1));
                     data.forEach(element => {
                         var infoDiv = $("<div></div>").addClass("content-div my-queue-member-holder");
@@ -592,6 +593,7 @@ $(".queue-control").click(function() {
                         // infoDiv.append(infoP);
                         // infoDiv.append(hiddenP);
                         target.append(infoDiv.append([infoP, hiddenP]));
+                        subTarget.append(infoDiv.append([infoP, hiddenP]).clone());
                     });
                 }
             }
@@ -603,9 +605,9 @@ $(".queue-control").click(function() {
 //  всех оставшихся участников очереди
 $("#remove-first-user").click(function() {
 
-    var toRemove = $("#my-queue-members").children(".my-queue-member-holder").eq(0);
+    // var toRemove = $("#my-queue-members").children(".my-queue-member-holder").eq(0);
     var queueId = $("#queue-id").text();
-    var userId = toRemove.find(".queue-user-id").text();
+    var userId = $("#my-queue-members").children(".my-queue-member-holder").eq(0).find(".queue-user-id").text();
     
     $.post("/Queue/RemoveUser", { id: queueId, userId: userId })
         .done(function(data) {
@@ -615,20 +617,20 @@ $("#remove-first-user").click(function() {
             } else {
                 console.log("Status: OK");
 
-                toRemove.remove();
+                // toRemove.remove();
 
-                if ($("#my-queue-members").children().length == 0) {
-                    var infoDiv = $("<div></div>").addClass("content-div my-queue-member-holder");
-                    var infoP = $("<p></p>").text("No users are in queue");
+                // if ($("#my-queue-members").children().length == 0) {
+                //     var infoDiv = $("<div></div>").addClass("content-div my-queue-member-holder");
+                //     var infoP = $("<p></p>").text("Очередь пуста");
 
-                    infoDiv.append(infoP);
-                    $("#my-queue-members").append(infoDiv);
-                    $("#remove-first-user").prop("disabled", true);
-                }
+                //     infoDiv.append(infoP);
+                //     $("#my-queue-members").append(infoDiv);
+                //     $("#remove-first-user").prop("disabled", true);
+                // }
                 
-                var counter = $(`#user-count-${queueId}`);
-                var userCount = parseInt(counter.text().substring(1, counter.text().length - 1)) - 1;
-                counter.text("(" + userCount + ")");
+                // var counter = $(`#user-count-${queueId}`);
+                // var userCount = parseInt(counter.text().substring(1, counter.text().length - 1)) - 1;
+                // counter.text("(" + userCount + ")");
             }
         })
 });

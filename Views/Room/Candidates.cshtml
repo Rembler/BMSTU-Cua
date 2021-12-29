@@ -1,0 +1,55 @@
+@{
+    ViewData["Title"] = "Отправка приглашений";
+}
+
+<div class="modal fade" id="sendRequesConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="sendRequestConfirmationModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <p id="got-id" hidden></p>
+        <div class="modal-content separate-div modal-div">
+            <div class="modal-header">
+                <div class="content-div content-modal-header">
+                    <h5 class="modal-title" id="sendRequestConfirmationModalTitle">Хотите отправить приглашение пользователю?</h5>
+                </div>
+            </div>
+            <div class="modal-body">
+                <input id="comment-input" type="text" class="my-input" placeholder="Оставьте комментарий" />
+            </div>
+            <div class="modal-footer">
+                <button id="send-request-to-user" type="button" class="btn btn-primary yn-btn">Да</button>
+                <button type="button" class="btn btn-secondary yn-btn" data-dismiss="modal">Нет</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-container">
+    <div class="row">
+        <div class="aling-self-start col-3 criteria-div">
+            <div class="row">
+                <div class="separate-div col">
+                    <a asp-action="Content" asp-controller="Room" asp-route-id=@ViewContext.RouteData.Values["id"]>
+                        <button type="button" class="btn btn-primary my-back-btn">Назад</button>
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="separate-div">
+                    <input id="user-name-cri" class="my-input criteria-input candidates-input" type="text" placeholder="Имя пользователя"/>
+                    <input id="user-company-cri" class="my-input criteria-input candidates-input" type="text" placeholder="Организация"/>
+                </div>
+            </div>
+        </div>
+        <div id="items-holder" class="flex-fill ml-5">
+            @* <div class="separate-div room-for-join-div">
+                <p id="queueId-1" class="hidden-p" hidden>1</p>
+                <div class="row">
+                    <div class="col-6 content-div"><p>Kakoe-to imya</p></div>
+                    <div class="col content-div"><p>Kakaya-to orga</p></div>
+                    <div class="col-2 join-btn-holder">
+                        <button data-toggle="modal" data-target="#sendRequesConfirmationModal" class="btn btn-primary join-room-btn id-giver">Invite</button>
+                    </div>
+                </div>
+            </div> *@
+        </div>
+    </div>
+</div>

@@ -1,0 +1,54 @@
+@{
+    ViewData["Title"] = "Настройки очереди";
+}
+
+@model Cua.Models.Queue
+
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+            <div class="separate-div separate-div-no-col">
+                <div class="content-div my-content-label-div"><p>Участники:</p></div>
+            </div>
+            <div class="separate-div separate-div-no-col">
+                @foreach (var item in Model.QueueUsers)
+                {
+                    <div class="content-div my-participant-div">
+                        <p>@item.User.Name @item.User.Surname</p>
+                        <p class="user-id" hidden>@item.User.Id</p>
+                        <a class="my-delete-user-link delete-queue-user" href="#" onclick="return false;" title="Исключить из очереди"><ion-icon name="close-outline"></ion-icon></a>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="col">
+            <div class="separate-div">
+                <div class="row">
+                    <div class="col my-control-input-holder my-control-input-holder-without-padding" style="display: none;">
+                        <input id="queue-name-input" type="text" class="my-input" value="@Model.Name" placeholder="Название очереди" />
+                    </div>
+                    <div id="queue-name-info" class="col content-div my-info-div"><p>@Model.Name</p></div>
+                </div>
+                <div class="row">
+                    <div class="col my-control-input-holder my-control-input-holder-without-padding" style="display: none;">
+                        <input id="limit-input" type="number" class="my-input" value="@Model.Limit" placeholder="Ограничение на количество участников" />
+                    </div>
+                    <div id="limit-info" class="col content-div my-info-div"><p>Ограничение: @Model.Limit</p></div>
+                    <div class="col my-control-input-holder my-control-input-holder-without-padding" style="display: none;">
+                        <input id="start-at-input" type="datetime-local" class="my-input" value=@Model.StartAt.ToString("yyyy-MM-ddTHH:mm") />
+                    </div>
+                    <div id="start-at-info" class="col content-div my-info-div"><p>@Model.StartAt.ToString("dd.MM.yyyy HH:mm")</p></div>
+                </div>
+            </div>
+            <div class="separate-div">
+                <div class="row">
+                    <div class="col my-show-queues-btn-holder">
+                        <button type="button" class="btn btn-primary save-changes save-queue-changes my-qs-btn" style="display: none;">Сохранить изменения</button>
+                        <button type="button" class="btn btn-primary change-description my-qs-btn">Изменить информацию</button>
+                    </div>
+                    <div class="col my-show-queues-btn-holder">
+                        <a asp-action="Control" asp-controller="Room" asp-route-id=@Model.RoomId><button type="button" class="btn btn-primary my-qs-btn">Назад</button></a>
+                    </div>
+        </div>
+    </div>
+</div>

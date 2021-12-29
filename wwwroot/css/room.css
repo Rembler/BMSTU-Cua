@@ -1,0 +1,134 @@
+.my-content-div-container {
+    max-width: 90%;
+}
+
+.separate-div-no-col {
+    padding: 8px;
+}
+
+.my-content-label-div {
+    width: 96%;
+}
+
+.my-content-label-div p {
+    text-align: center;
+}
+
+.my-participant-div {
+    padding: 0 10px;
+}
+
+.my-show-queues-btn-holder {
+    padding: 0 10px;
+}
+
+.my-qs-btn {
+    width: 100%;
+}
+
+.join-room-btn:disabled {
+    background-color: #214A71;
+}
+
+.my-back-btn {
+    width: 100%;
+}
+
+.request-btn {
+    margin-left: 8px;
+}
+
+.my-control-input-holder {
+    height: 40px;
+    margin: 8px;
+    /* padding: 0; */
+}
+
+div.content-div a {
+    vertical-align: middle;
+    display: table-cell;
+    padding-left: 10px;
+    font-size: 30px;
+}
+
+div.content-div a.my-delete-user-link, 
+a.delete-queue, a.my-undo-moderator,
+a.delete-timetable {
+    color: red;
+}
+
+div.content-div a.queue-control,
+a.my-make-moderator, a.my-settings-link {
+    color: #007bff;
+}
+
+a.my-make-moderator, a.my-undo-moderator,
+a.my-settings-link {
+    font-size: 25px !important;
+}
+
+a.my-undo-moderator {
+    padding-top: 3px;
+}
+
+.btn-danger {
+    font-size: 18px;
+    padding: 11px;
+    border: none;
+}
+
+.my-joinable-room-activity {
+    max-width: 478px;
+}
+
+.chat-div {
+    height: 380px;
+    overflow-y: auto;
+}
+
+.chat-div::-webkit-scrollbar {
+    display: none;
+}
+
+#messagesList {
+    list-style: none;
+    padding: 0;
+}
+
+.content-div.my-msg-div {
+    padding: 5px 14px;
+}
+
+p.my-msg-sender {
+    display: table-row !important;
+    font-size: 14px;
+    color: #3683e9;
+}
+
+p.my-msg-body {
+    display: table-row !important;
+}
+
+.my-own-msg-div {
+    margin-left: auto;
+}
+
+.my-control-input-holder-without-padding {
+    padding: 0;
+}
+
+.my-appointment-modal-header {
+    display: block;
+}
+
+option {
+    color: black;
+}
+
+.my-notification:hover {
+    cursor: pointer;
+}
+
+ion-icon {
+    pointer-events: none;
+}

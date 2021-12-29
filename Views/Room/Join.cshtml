@@ -1,0 +1,126 @@
+@{
+    ViewData["Title"] = "Доступные комнаты";
+}
+
+@model Cua.ViewModels.JoinRoomModel
+
+<div class="modal fade" id="roomJoinModal" tabindex="-1" role="dialog" aria-labelledby="roomJoinTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <p id="got-id" hidden></p>
+        <div class="modal-content separate-div modal-div">
+            <div class="modal-header">
+                <div class="content-div content-modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Хотите присоединиться к комнате?</h5>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="addRoom" type="button" class="btn btn-primary yn-btn">Да</button>
+                <button type="button" class="btn btn-secondary yn-btn" data-dismiss="modal">Нет</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="privateRoomJoinModal" tabindex="-1" role="dialog" aria-labelledby="privateRoomJoinTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <p id="got-id-alternative" hidden></p>
+        <div class="modal-content separate-div modal-div">
+            <div class="modal-header">
+                <div class="content-div content-modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Хотите отправить заявку на вступление?</h5>
+                </div>
+            </div>
+            <div class="modal-body">
+                <input id="comment-input" type="text" class="my-input" placeholder="Оставьте комментарий" />
+            </div>
+            <div class="modal-footer">
+                <button id="sendRequest" type="button" class="btn btn-primary yn-btn">Да</button>
+                <button type="button" class="btn btn-secondary yn-btn" data-dismiss="modal">Нет</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-container">
+<div class="row">
+    <div class="aling-self-start col-3 separate-div criteria-div">
+        <div class="content-div criteria-header"><p>Критерии поиска</p></div>
+        <input id="room-cri" class="my-input criteria-input" type="text" placeholder="Название комнаты"/>
+        <input id="admin-cri" class="my-input criteria-input" type="text" placeholder="Имя админа"/>
+        <input id="company-cri" class="my-input criteria-input" type="text" placeholder="Название организации"/>
+        <div class="checkbox-holder">
+            <input id="private-checkbox" type="checkbox"/><label>Только закрытые комнаты</label>
+        </div>
+    </div>
+    <div id="items-holder" class="flex-fill ml-5">
+    @foreach (var item in Model.Rooms)
+    {
+        @if (!item.Hidden)
+        {
+        <div class="separate-div room-for-join-div">
+            <p id="roomId-@item.Id" class="hidden-p" hidden>@item.Id</p>
+            <div class="row">
+                <div class="col">
+                    <div class="row">
+                        <div class="col-1 illustration">
+                        @if (item.Private)
+                        {
+                            <span title="Закрытая комната"><ion-icon name="lock-closed-outline"></ion-icon></span>
+                        }
+                        else
+                        {
+                            <span title="Открытая комната"><ion-icon name="lock-open-outline"></ion-icon></span>
+                        }
+                        </div>
+                        <div class="col content-div"><p class="room-name">@item.Name</p></div>
+                        <div class="col-4 content-div">
+                            <p class="admin-name">Админ: @item.Admin.Name @item.Admin.Surname</p><br/>
+                        </div>
+                    </div>
+                    @{ int index = 0; }
+                    @foreach (var queue in item.Queues)
+                    {
+                        if (index % 2 == 0)
+                        {
+                            @Html.Raw("<div class=\"row\">");
+                        }
+                        <div class="col content-div my-joinable-room-activity">
+                            <p>Очередь "@queue.Name"</p>
+                        </div>
+                        if (index % 2 != 0)
+                        {
+                            @Html.Raw("</div>");
+                        }
+                        index++;
+                    }
+                    @if (index % 2 != 0)
+                    {
+                        @Html.Raw("</div>");
+                    }
+                    <div class="row">
+                        <div class="col content-div company-name"><p>Организация: @item.Company</p></div>
+                        <div class="col content-div"><p>Количество участников: @item.RoomUsers.Count()</p></div>
+                        @if (item.Private)
+                        {
+                            if (Model.Requests.Any(r => r.Room == item && r.Checked == false))
+                            {
+                                <div class="col join-btn-holder"><button class="btn btn-primary join-room-btn id-giver" data-toggle="modal" data-target="#privateRoomJoinModal" disabled>Присоединиться</button></div>
+                            }
+                            else
+                            {
+                                <div class="col join-btn-holder"><button class="btn btn-primary join-room-btn id-giver" data-toggle="modal" data-target="#privateRoomJoinModal">Присоединиться</button></div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col join-btn-holder"><button class="btn btn-primary join-room-btn id-giver" data-toggle="modal" data-target="#roomJoinModal">Присоединиться</button></div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    }
+    </div>
+</div>
+</div>

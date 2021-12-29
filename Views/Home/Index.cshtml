@@ -1,0 +1,140 @@
+﻿@{
+    ViewData["Title"] = "Домашняя страница";
+}
+
+@model IEnumerable<Room>
+
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content separate-div modal-div">
+            <div class="modal-header">
+                <div class="content-div content-modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Хотите создать комнату или присоединиться к существующей?</h5>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a asp-controller="Room" asp-action="Create"><button type="button" class="btn btn-primary cj-btn">Создать</button></a>
+                <a asp-controller="Room" asp-action="Join"><button type="button" class="btn btn-primary cj-btn">Вступить</button></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container separate-div menu-div">
+    <div class="row">
+        <div class="col">
+            <input class="my-input search-input" type="text" placeholder="Найти комнату..."/>
+        </div>
+        <div class="col-2">
+            <div class="dropdown">
+                <p hidden id="direction">1</p>
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Сортировать
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a id="created-joined" class="dropdown-item" href="#" onclick="return false;">Создана / добавлена</a>
+                    @* <a id="last-updated" class="dropdown-item" href="#" onclick="return false;">Last updated</a>   *@
+                    <a id="name" class="dropdown-item" href="#" onclick="return false;">По имени</a>                                      
+                </div>
+            </div>
+        </div>
+        <div class="col-2">
+            <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#exampleModalCenter">Добавить</button>
+        </div>
+    </div>
+</div>
+
+<div class="container room-holder">
+
+@foreach (var item in Model)
+{
+    <a asp-controller="Room" asp-action="Content" asp-route-id=@item.Id>
+    <div class="container separate-div">
+        <div class="row">
+            <div class="col">
+                <div class="row">
+                    <div class="col-8 content-div"><p class="room-name">@item.Name</p></div>
+                    <div class="col content-div">
+                        @if (item.Admin.Email == ViewBag.CurrentUser)
+                        {
+                            <p class="admin-name">Админ: я</p>
+                        }
+                        else
+                        {
+                            <p class="admin-name">Админ: @item.Admin.Name @item.Admin.Surname</p>
+                        }
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col content-div"><p>Органицация: @item.Company</p></div>
+                            <div class="col content-div"><p>Количество участников: @item.RoomUsers.Count()</p></div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="row">
+                            <div class="col illustration">
+                            @if (item.Private)
+                            {
+                                <span title="Закрытая комната"><ion-icon name="lock-closed-outline"></ion-icon></span>
+                            }
+                            else
+                            {
+                                <span title="Открытая комната"><ion-icon name="lock-open-outline"></ion-icon></span>
+                            }
+                            </div>
+                            <div class="col illustration">
+                            @if (item.Hidden)
+                            {
+                                <span title="Скрытая комната"><ion-icon name="eye-off-outline"></ion-icon></span>
+                            }
+                            else
+                            {
+                                <span title="Видимая комната"><ion-icon name="eye-outline"></ion-icon></span>
+                            }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @{ int index = 0; }
+                @foreach (var queue in item.Queues)
+                {
+                    if (index % 2 == 0)
+                    {
+                        @Html.Raw("<div class=\"row\">");
+                    }
+                    <div class="col content-div room-activity">
+                        <p>Очередь "@queue.Name" (Начало: @queue.StartAt.ToString("dd.MM.yyyy") в @queue.StartAt.ToString("HH:mm"))</p>
+                    </div>
+                    if (index % 2 != 0)
+                    {
+                        @Html.Raw("</div>");
+                    }
+                    index++;
+                }
+                @foreach (var timetable in item.Timetables)
+                {
+                    if (index % 2 == 0)
+                    {
+                        @Html.Raw("<div class=\"row\">");
+                    }
+                    <div class="col content-div room-activity">
+                        <p>Расписание "@timetable.Name" (С @timetable.StartDate.ToString("dd.MM.yyyy") до @timetable.EndDate.ToString("dd.MM.yyyy"))</p>
+                    </div>
+                    if (index % 2 != 0)
+                    {
+                        @Html.Raw("</div>");
+                    }
+                    index++;
+                }
+                @if (index % 2 != 0)
+                {
+                    @Html.Raw("</div>");
+                }
+            </div>
+        </div>
+    </div>
+    </a>
+}
+</div>
